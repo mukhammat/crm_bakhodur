@@ -30,6 +30,9 @@ export const tasks = table("tasks", {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
   description: t.text('description').notNull(),
   status: taskStatusEnum('status').notNull().default('pending'),
+  createdAt: t.timestamp('created_at').notNull().defaultNow(),
+  dueDate: t.timestamp('due_date'), // Срок выполнения задачи
+  priority: t.integer('priority').notNull().default(0), // Приоритет задачи
   createdBy: t.uuid('created_by')
   .notNull()
   .references(() => users.id, { onDelete: 'cascade' }),
