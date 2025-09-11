@@ -20,5 +20,7 @@ export const taskRouter = (db: DrizzleClient) => {
     
     .use(requireRole(['admin']))
     .put("/:id", taskController.update)
-    .delete("/:id", taskController.delete);
+    .delete("/:id", taskController.delete)
+    .post('/assign-task-worker', taskController.assignTaskToWorker)
+    .delete('/unassign-task-from-worker/:id', taskController.unassignTaskFromWorker)
 };

@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { tasks, type DrizzleClient } from "../../../database/index.js";
+import { taskAssignments, tasks, type DrizzleClient } from "../../../database/index.js";
 import { CustomError } from "../../errors/custom.error.js";
 
 export interface ITaskService {
@@ -11,6 +11,8 @@ export interface ITaskService {
     data: Partial<Pick<typeof tasks.$inferInsert, "description" | "status">>
   ): Promise<string>;
   delete(id: string): Promise<string>;
+  assignTaskToWorker(taskId: string, workerId: string): Promise<string>
+  unassignTaskFromWorker(taskAssignmentId: string): Promise<string>
 }
 
 export class TaskService implements ITaskService {
@@ -54,7 +56,7 @@ export class TaskService implements ITaskService {
 
   public async update(
     id: string,
-    data: Partial<Pick<typeof tasks.$inferInsert, "description" | "status">>
+    data: Partial<Pick<typeof tasks.$inferInsert, "description" | "status" | "dueDate">>
   ) {
     const updated = await this.db
       .update(tasks)
@@ -63,7 +65,7 @@ export class TaskService implements ITaskService {
       .returning({
         id: tasks.id,
       });
-
+ 
     if (updated.length === 0) {
       throw new CustomError("Задача для обновления не найдена");
     }
@@ -84,5 +86,30 @@ export class TaskService implements ITaskService {
     }
 
     return deleted[0].id
+  }
+
+  public async assignTaskToWorker(taskId: string, workerId: string) {
+    const [ asign ] = await this.db
+    .insert(taskAssignments)
+    .values({
+      taskId,
+      workerId
+    })
+    .returning({
+      id: taskAssignments.id
+    })
+
+    return asign.id
+  }
+
+  public async unassignTaskFromWorker(taskAssignmentId: string) {
+    const [ asign ] = await this.db
+    .delete(taskAssignments)
+    .where(eq(taskAssignments.id, taskAssignmentId))
+    .returning({
+      id: taskAssignments.id
+    })
+
+    return asign.id
   }
 }
