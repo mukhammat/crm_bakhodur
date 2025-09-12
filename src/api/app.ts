@@ -17,7 +17,7 @@ import { userRouter } from "./modules/user/user.router.js";
 apiApp
 .route('/auth', authRouter(db))
 .route("/tasks", taskRouter(db))
-.route("/user", userRouter())
+.route("/users", userRouter(db))
 
 
 // Global handlers

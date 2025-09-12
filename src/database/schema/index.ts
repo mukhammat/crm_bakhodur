@@ -25,10 +25,36 @@ export const workers = table("workers", {
   name: t.varchar('name', { length: 100 }).notNull(),
 });
 
+export const usersRelations = relations(users, ({ one }) => ({
+  manager: one(managers, {
+    fields: [users.id],
+    references: [managers.userId],
+  }),
+  worker: one(workers, {
+    fields: [users.id],
+    references: [workers.userId],
+  }),
+}));
+
+export const managersRelations = relations(managers, ({ one }) => ({
+  user: one(users, {
+    fields: [managers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const workersRelations = relations(workers, ({ one }) => ({
+  user: one(users, {
+    fields: [workers.userId],
+    references: [users.id],
+  }),
+}));
+
 export const taskStatusEnum = t.pgEnum('task_status', ['pending', 'in_progress', 'completed']);
 
 export const tasks = table("tasks", {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
+  title: t.varchar().notNull(),
   description: t.text('description').notNull(),
   status: taskStatusEnum('status').notNull().default('pending'),
   createdAt: t.timestamp('created_at').notNull().defaultNow(),
@@ -55,3 +81,11 @@ export const taskAssignmentsRelations = relations(taskAssignments, ({ one }) => 
     references: [workers.id],
   }),
 }));
+
+export const tasksRelations = relations(tasks, ({ many, one }) => ({
+  assignments: many(taskAssignments),
+  createdBy: one(users, {
+    fields: [tasks.createdBy],
+    references: [users.id],
+  }),
+}))

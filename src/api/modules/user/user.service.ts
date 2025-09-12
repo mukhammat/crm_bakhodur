@@ -1,13 +1,16 @@
 import { randomBytes } from "crypto";
 import { redis } from "../../../cache/index.js";
 import { CustomError } from "../../errors/custom.error.js";
+import type { DrizzleClient } from "../../../database/index.js";
+import type { GetUserDto } from "./user.dto.js";
 
 export interface IUserService {
   generateRegisterKey(role: "manager" | "admin"): Promise<string>;
+  getAll(): Promise<GetUserDto[]>
 }
 
 export class UserService implements IUserService {
-  constructor() {}
+  constructor(private db: DrizzleClient) {}
 
   public async generateRegisterKey(role: "manager" | "admin") {
     if (!["manager", "admin"].includes(role)) {
@@ -21,5 +24,16 @@ export class UserService implements IUserService {
     await redis.set(`register_key:${key}`, role, 'EX', 3600);
 
     return key;
+  }
+
+  public async getAll() {
+    return this.db
+    .query
+    .users
+    .findMany({
+      columns: {
+        hash: false
+      }
+    })
   }
 }

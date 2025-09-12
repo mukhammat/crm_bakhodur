@@ -14,4 +14,9 @@ export class UserController {
     const key = await this.userService.generateRegisterKey(role);
     return c.json({ data: { key } });
   };
+
+  getAll = async (c: Context) => {
+    const users = await this.userService.getAll();
+    return c.json({ data: { users } });
+  }
 }

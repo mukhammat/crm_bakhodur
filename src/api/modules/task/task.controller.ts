@@ -1,6 +1,6 @@
 import { type JwtVariables } from 'hono/jwt'
 import type { Context } from "hono";
-import type { ITaskService } from "./task.interface.js";
+import type { ITaskService } from "./task.service.js";
 
 type ContextJWT = Context<{ Variables: JwtVariables<{ id: string }> }>;
 
@@ -8,9 +8,11 @@ export class TaskController {
   constructor(private taskService: ITaskService) {}
 
   create = async (c: ContextJWT) => {
-    const { description } = await c.req.json();
+    const { title, description } = await c.req.json();
     const { id } = c.get('jwtPayload');
-    const taskId = await this.taskService.create(description, id);
+    const taskId = await this.taskService
+    .create({ title, description, createdBy: id });
+    
     return c.json({ data: { id: taskId } }, 201);
   };
 

@@ -1,19 +1,25 @@
 import { eq } from "drizzle-orm";
 import { taskAssignments, tasks, type DrizzleClient } from "../../../database/index.js";
 import { CustomError } from "../../errors/custom.error.js";
-import { type ITaskService } from './task.interface.js'
+import type { CreateDto, UpdateDto } from "./task.dto.js";
 
+export interface ITaskService {
+  create(data: CreateDto): Promise<string>;
+  getById(id: string): Promise<typeof tasks.$inferSelect | null>;
+  getAll(createdBy?: string): Promise<typeof tasks.$inferSelect[]>;
+  update( id: string, data: UpdateDto ): Promise<string>;
+  delete(id: string): Promise<string>;
+  assignTaskToWorker(taskId: string, workerId: string): Promise<string>
+  unassignTaskFromWorker(taskAssignmentId: string): Promise<string>
+}
 
 export class TaskService implements ITaskService {
   constructor(private db: DrizzleClient) {}
 
-  public async create(description: string, createdBy: string) {
+  public async create(data: CreateDto) {
     const [task] = await this.db
       .insert(tasks)
-      .values({
-        description,
-        createdBy,
-      })
+      .values(data)
       .returning({
         id: tasks.id,
       });
@@ -37,6 +43,9 @@ export class TaskService implements ITaskService {
     if (createdBy) {
       return this.db.query.tasks.findMany({
         where: eq(tasks.createdBy, createdBy),
+        with: {
+          assignments: true
+        }
       });
     }
 
@@ -45,21 +54,14 @@ export class TaskService implements ITaskService {
 
   public async update(
     id: string,
-    data: Partial<Pick<typeof tasks.$inferInsert, "description" | "status" | "dueDate">>
+    data: UpdateDto
   ) {
-    const updated = await this.db
+    await this.db
       .update(tasks)
       .set(data)
       .where(eq(tasks.id, id))
-      .returning({
-        id: tasks.id,
-      });
- 
-    if (updated.length === 0) {
-      throw new CustomError("Задача для обновления не найдена");
-    }
 
-    return updated[0].id;
+    return id;
   }
 
   public async delete(id: string) {
