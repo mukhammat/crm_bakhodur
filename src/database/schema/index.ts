@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import { pgTable as table } from 'drizzle-orm/pg-core';
 import * as t from 'drizzle-orm/pg-core';
 
@@ -43,3 +44,14 @@ export const taskAssignments = table("task_assignments", {
   taskId: t.uuid('task_id').notNull().references(() => tasks.id, { onDelete: 'cascade' }),
   workerId: t.uuid('worker_id').notNull().references(() => workers.id, { onDelete: 'cascade' }),
 });
+
+export const taskAssignmentsRelations = relations(taskAssignments, ({ one }) => ({
+  task: one(tasks, {
+    fields: [taskAssignments.taskId],
+    references: [tasks.id],
+  }),
+  worker: one(workers, {
+    fields: [taskAssignments.workerId],
+    references: [workers.id],
+  }),
+}));

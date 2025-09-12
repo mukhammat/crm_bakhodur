@@ -1,6 +1,6 @@
 import { type JwtVariables } from 'hono/jwt'
 import type { Context } from "hono";
-import type { ITaskService } from "./task.service.js";
+import type { ITaskService } from "./task.interface.js";
 
 type ContextJWT = Context<{ Variables: JwtVariables<{ id: string }> }>;
 

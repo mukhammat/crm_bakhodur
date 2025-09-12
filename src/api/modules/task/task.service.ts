@@ -1,19 +1,8 @@
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { taskAssignments, tasks, type DrizzleClient } from "../../../database/index.js";
 import { CustomError } from "../../errors/custom.error.js";
+import { type ITaskService } from './task.interface.js'
 
-export interface ITaskService {
-  create(description: string, createdBy: string): Promise<string>;
-  getById(id: string): Promise<typeof tasks.$inferSelect | null>;
-  getAll(createdBy?: string): Promise<typeof tasks.$inferSelect[]>;
-  update(
-    id: string,
-    data: Partial<Pick<typeof tasks.$inferInsert, "description" | "status">>
-  ): Promise<string>;
-  delete(id: string): Promise<string>;
-  assignTaskToWorker(taskId: string, workerId: string): Promise<string>
-  unassignTaskFromWorker(taskAssignmentId: string): Promise<string>
-}
 
 export class TaskService implements ITaskService {
   constructor(private db: DrizzleClient) {}
