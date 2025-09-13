@@ -9,37 +9,21 @@ export const users = table("users", {
   role: userRoleEnum("role").default("manager").notNull(),
   email: t.varchar('email', { length: 100 }).notNull().unique(),
   hash: t.varchar('hash').notNull(),
+  name: t.varchar('name', { length: 100 }).notNull(),
   isActive: t.boolean('is_active').notNull().default(true),
 });
 
-export const managers = table("managers", {
-  id: t.uuid().primaryKey().notNull().defaultRandom(),
-  userId: t.uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
-  name: t.varchar('name', { length: 100 }).notNull(),
-});
 
 export const workers = table("workers", {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
   userId: t.uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
   telegramId: t.integer('telegram_id').notNull().unique(),
-  name: t.varchar('name', { length: 100 }).notNull(),
 });
 
 export const usersRelations = relations(users, ({ one }) => ({
-  manager: one(managers, {
-    fields: [users.id],
-    references: [managers.userId],
-  }),
   worker: one(workers, {
     fields: [users.id],
     references: [workers.userId],
-  }),
-}));
-
-export const managersRelations = relations(managers, ({ one }) => ({
-  user: one(users, {
-    fields: [managers.userId],
-    references: [users.id],
   }),
 }));
 

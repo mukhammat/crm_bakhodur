@@ -19,11 +19,9 @@ apiApp
 .route("/tasks", taskRouter(db))
 .route("/users", userRouter(db))
 
-
 // Global handlers
 import { errorHandler } from './middleware/error-handler.js'
 import { notFound } from './middleware/not-found.js'
-
 
 apiApp
 .onError(errorHandler)

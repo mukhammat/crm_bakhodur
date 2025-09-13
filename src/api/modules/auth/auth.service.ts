@@ -3,7 +3,7 @@ import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { and, eq } from "drizzle-orm";
 import { type StringValue } from 'ms';
 import { CustomError } from '../../errors/custom.error.js';
-import { managers, users, type DrizzleClient } from "../../../database/index.js";
+import { users, type DrizzleClient } from "../../../database/index.js";
 import { type RegisterDto, } from "../../modules/auth/auth.dto.js";
 import { redis } from '../../../cache/index.js'
 
@@ -75,17 +75,12 @@ export class AuthService implements IAuthService {
                 email,
                 hash: hash,
                 role: role,
+                name
             })
             .returning({
                 id: users.id
             });
 
-            await tx
-            .insert(managers)
-            .values({
-                name,
-                userId: newUser.id
-            });
 
             return newUser.id;
         })
