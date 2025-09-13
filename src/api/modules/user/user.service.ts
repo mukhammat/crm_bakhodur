@@ -2,12 +2,12 @@ import { randomBytes } from "crypto";
 import { redis } from "../../../cache/index.js";
 import { CustomError } from "../../errors/custom.error.js";
 import { users, type DrizzleClient } from "../../../database/index.js";
-import type { GetUserDto, UserUpdateDto } from "./user.dto.js";
+import type { GetUserDto, UpdateDto } from "./user.dto.js";
 
 export interface IUserService {
   generateRegisterKey(role: "manager" | "admin"): Promise<string>;
   getAll(): Promise<GetUserDto[]>
-  update(userId: string, data: UserUpdateDto): Promise<string>
+  update(userId: string, data: UpdateDto): Promise<string>
 }
 
 export class UserService implements IUserService {
@@ -39,7 +39,7 @@ export class UserService implements IUserService {
     })
   }
 
-  public async update(userId: string, data: UserUpdateDto) {
+  public async update(userId: string, data: UpdateDto) {
     await this.db
     .update(users)
     .set(data)
