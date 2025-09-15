@@ -44,14 +44,31 @@ export class TaskService implements ITaskService {
       return this.db.query.tasks.findMany({
         where: eq(tasks.createdBy, createdBy),
         with: {
-          assignments: true,
+          assignments: {
+            with: {
+              user: {
+                columns: {
+                  hash: false
+                }
+              }
+            }
+          },
         }
       });
     }
 
     return this.db.query.tasks.findMany({
       with: {
-        assignments: true,
+        assignments: {
+          with: {
+            user: {
+                columns: {
+                  hash: false,
+                  name: true
+                }
+            }
+          }
+        },
         createdBy: {
           columns: {
             hash: false,
@@ -90,12 +107,12 @@ export class TaskService implements ITaskService {
     return deleted[0].id
   }
 
-  public async assignTaskToWorker(taskId: string, workerId: string) {
+  public async assignTaskToWorker(taskId: string, userId: string) {
     const [ asign ] = await this.db
     .insert(taskAssignments)
     .values({
       taskId,
-      workerId
+      userId
     })
     .returning({
       id: taskAssignments.id

@@ -13,11 +13,13 @@ const apiApp = new Hono()
 import { authRouter } from './modules/auth/auth.router.js'
 import { taskRouter } from './modules/task/task.router.js'
 import { userRouter } from "./modules/user/user.router.js";
+import { workerRouter } from './modules/worker/worker.router.js'
 
 apiApp
 .route('/auth', authRouter(db))
 .route("/tasks", taskRouter(db))
 .route("/users", userRouter(db))
+.route('/workers', workerRouter(db))
 
 // Global handlers
 import { errorHandler } from './middleware/error-handler.js'

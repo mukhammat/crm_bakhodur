@@ -52,17 +52,19 @@ export const tasks = table("tasks", {
 export const taskAssignments = table("task_assignments", {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
   taskId: t.uuid('task_id').notNull().references(() => tasks.id, { onDelete: 'cascade' }),
-  workerId: t.uuid('worker_id').notNull().references(() => workers.id, { onDelete: 'cascade' }),
-});
+  userId: t.uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+}, (table) => ({
+  uniq: t.unique().on(table.taskId, table.userId)
+}));
 
 export const taskAssignmentsRelations = relations(taskAssignments, ({ one }) => ({
   task: one(tasks, {
     fields: [taskAssignments.taskId],
     references: [tasks.id],
   }),
-  worker: one(workers, {
-    fields: [taskAssignments.workerId],
-    references: [workers.id],
+  user: one(users, {
+    fields: [taskAssignments.userId],
+    references: [users.id],
   }),
 }));
 

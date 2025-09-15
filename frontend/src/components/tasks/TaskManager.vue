@@ -24,6 +24,7 @@ async function getTasks() {
     })
     const data = await response.json()
     tasks.value = data.data.tasks
+    console.log(data.data.tasks)
   } catch (error) {
     console.error('Error fetching tasks:', error)
   }

@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <v-col cols="12" md="8">
+      <v-col cols="12" md="10">
         <v-card>
           <v-data-table
             :headers="headers"
@@ -24,18 +24,24 @@
               <v-menu>
                 <template #activator="{ props }">
                   <v-btn v-bind="props" color="primary" size="small">
-                    Работники ({{ item.assignments.worker?.length || 0 }})
+                    Пользователи ({{ item.assignments?.length || 0 }})
                   </v-btn>
                 </template>
 
                 <v-list>
                   <v-list-item
-                    v-for="(worker, i) in item.assignments"
+                    v-for="(assignment, i) in item.assignments"
                     :key="i"
                   >
                     <v-list-item-title>
-                      {{ worker.worker?.name || 'Без имени' }}
+                      {{ assignment.user?.name || 'Без имени' }}
+                      <v-chip size="x-small" :color="getRoleColor(assignment.user?.role)" class="ml-2">
+                        {{ assignment.user?.role }}
+                      </v-chip>
                     </v-list-item-title>
+                  </v-list-item>
+                  <v-list-item v-if="!item.assignments || item.assignments.length === 0">
+                    <v-list-item-title class="text-grey">Никто не назначен</v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
@@ -44,26 +50,32 @@
             <!-- eslint-disable-next-line vue/valid-v-slot -->
             <template #item.status="{ item }">
               <v-chip
-                :color="item?.status === 'completed' ? 'green' : 'orange'"
+                :color="getStatusColor(item?.status)"
                 variant="flat"
               >
-                {{ item?.status }}
+                {{ getStatusText(item?.status) }}
               </v-chip>
             </template>
 
             <!-- eslint-disable-next-line vue/valid-v-slot -->
             <template #item.actions="{ item }">
-              <v-btn color="primary" size="small" @click="openEditDialog(item)" class="mr-2">
-                Обновить
-              </v-btn>
-              <v-btn
-                color="red"
-                size="small"
-                @click="deleteTask(item.id)"
-                :loading="deletingTasks.includes(item.id)"
-              >
-                Удалить
-              </v-btn>
+              <div class="d-flex ga-2">
+                <v-btn 
+                  color="primary" 
+                  size="small" 
+                  @click="openEditDialog(item)"
+                >
+                  Обновить
+                </v-btn>
+                <v-btn
+                  color="red"
+                  size="small"
+                  @click="deleteTask(item.id)"
+                  :loading="deletingTasks.includes(item.id)"
+                >
+                  Удалить
+                </v-btn>
+              </div>
             </template>
 
           </v-data-table>
@@ -72,29 +84,109 @@
     </v-row>
 
     <!-- Диалог редактирования задачи -->
-<!-- Диалог редактирования задачи -->
-    <v-dialog v-model="showEditDialog" max-width="500px">
+    <v-dialog v-model="showEditDialog" max-width="600px">
       <v-card v-if="editingTask">
         <v-card-title>Редактировать задачу</v-card-title>
         <v-card-text>
-          <v-text-field v-model="editingTask.title" label="Название" required />
-          <v-text-field v-model="editingTask.description" label="Описание" required />
+          <v-text-field 
+            v-model="editingTask.title" 
+            label="Название" 
+            required 
+            class="mb-3"
+          />
+          
+          <v-textarea 
+            v-model="editingTask.description" 
+            label="Описание" 
+            required 
+            rows="3"
+            class="mb-4"
+          />
 
-          <!-- выбор работников -->
+          <!-- Выбор пользователей -->
           <v-select
             v-model="editingTask.workerIds"
-            :items="workers"
+            :items="users"
             item-title="name"
             item-value="id"
-            label="Назначить работников"
+            label="Назначить пользователей"
             multiple
             chips
-          />
+            closable-chips
+            :loading="loadingUsers"
+            class="mb-3"
+          >
+            <template #selection="{ item, index }">
+              <v-chip
+                v-if="index < 3"
+                size="small"
+                closable
+                color="primary"
+                variant="tonal"
+                @click:close="removeUser(item.raw.id)"
+              >
+                <v-icon start>mdi-account</v-icon>
+                {{ item.title }}
+              </v-chip>
+              <span
+                v-if="index === 3"
+                class="text-grey text-caption align-self-center ml-2"
+              >
+                (+{{ editingTask.workerIds.length - 3 }} других)
+              </span>
+            </template>
+
+            <template #item="{ props, item }">
+              <v-list-item v-bind="props" :title="item.title">
+                <template #prepend>
+                  <v-avatar size="32" :color="getRoleColor(item.raw.role)">
+                    <v-icon>mdi-account</v-icon>
+                  </v-avatar>
+                </template>
+                <template #append>
+                  <v-chip size="x-small" :color="getRoleColor(item.raw.role)">
+                    {{ item.raw.role }}
+                  </v-chip>
+                  <v-icon 
+                    v-if="editingTask.workerIds.includes(item.value)" 
+                    color="success"
+                    class="ml-2"
+                  >
+                    mdi-check
+                  </v-icon>
+                </template>
+              </v-list-item>
+            </template>
+
+            <template #no-data>
+              <v-list-item>
+                <v-list-item-title>Пользователи не найдены</v-list-item-title>
+              </v-list-item>
+            </template>
+          </v-select>
+
+          <!-- Информация о текущих назначениях -->
+          <v-alert 
+            v-if="editingTask.workerIds.length === 0" 
+            type="warning" 
+            variant="tonal"
+            class="mb-3"
+          >
+            Задача не назначена ни одному пользователю
+          </v-alert>
+
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn variant="text" @click="closeEditDialog">Отмена</v-btn>
-          <v-btn color="success" @click="saveEditTask" :loading="isAddingTask">
+          <v-btn variant="text" @click="closeEditDialog">
+            Отмена
+          </v-btn>
+          <v-btn 
+            color="success" 
+            @click="saveEditTask" 
+            :loading="isAddingTask"
+            :disabled="!editingTask.title || !editingTask.description"
+          >
             Сохранить
           </v-btn>
         </v-card-actions>
@@ -108,8 +200,7 @@
 import { ref, defineProps, toRef, onMounted } from 'vue'
 
 const TOKEN =
-  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlkYTQwZmIzLWQ4MGQtNGNjNy05NzYwLWMzMzU1YTMxMTU1OCIsImVtYWlsIjoiZG9zbmV0MjIwMEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTc5NTU1MjEsImV4cCI6MTc1ODA0MTkyMX0.v9XsylKfH_Kjux08TFwHsNLykDUVZ-OEdKcveV0TAMo' // вынеси в .env
-
+  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlkYTQwZmIzLWQ4MGQtNGNjNy05NzYwLWMzMzU1YTMxMTU1OCIsImVtYWlsIjoiZG9zbmV0MjIwMEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTc5NTU1MjEsImV4cCI6MTc1ODA0MTkyMX0.v9XsylKfH_Kjux08TFwHsNLykDUVZ-OEdKcveV0TAMo'
 
 // получаем проп
 const props = defineProps({
@@ -117,73 +208,109 @@ const props = defineProps({
   getTasks: Function
 })
 
-const tasks = toRef(props, 'tasks') // теперь используем пропс напрямую
-console.log(tasks)
+const tasks = toRef(props, 'tasks')
 const getTasks = props.getTasks
 
-const workers = ref([])
+const users = ref([])
 const deletingTasks = ref([])
 const showEditDialog = ref(false)
 const isAddingTask = ref(false)
 const editingTask = ref(null)
+const loadingUsers = ref(false)
 
+// Загрузка пользователей
 async function getUsers() {
-    try {
-        const response = await fetch(`http://localhost:3000/api/users`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: TOKEN,
-          },
-        })
+  try {
+    loadingUsers.value = true
+    const response = await fetch(`http://localhost:3000/api/users`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: TOKEN,
+      },
+    })
+
+    const data = await response.json()
+    console.log('Users loaded:', data.data.users)
+    users.value = data.data.users
     
-        const data = await response.json()
-        console.log(data.data.users)
-        workers.value = data.data.users;
-        
-    } catch (error) {
-        console.error('Error fetching tasks:', error)
-    }
+  } catch (error) {
+    console.error('Error fetching users:', error)
+  } finally {
+    loadingUsers.value = false
+  }
 }
 
 onMounted(getUsers)
 
-// Исправленные заголовки для Vuetify 3
+// Заголовки таблицы
 const headers = [
-  { title: 'Title', key: 'title' },
+  { title: 'Название', key: 'title' },
   { title: 'Описание', key: 'description' },
   { title: 'Статус', key: 'status' },
   { title: 'От', key: 'createdBy.name' },
-  { title: 'Работники', key: 'assignments.worker' },
+  { title: 'Пользователи', key: 'assignments.worker' },
   { title: 'Действия', key: 'actions', sortable: false },
 ]
 
-
-// Вызываем при клике "Update" на строке таблицы
-// function openEditDialog(task) {
-//   editingTask.value = { ...task }
-//   showEditDialog.value = true
-// }
-
+// Открытие диалога редактирования
 function openEditDialog(task) {
+  console.log('Opening edit dialog for task:', task)
+  console.log('Task assignments:', task.assignments)
+
   editingTask.value = {
     ...task,
-    workerIds: task.assignments?.map(a => a.workerId) || []
+    // ИСПРАВЛЕНИЕ: правильно извлекаем ID пользователей из назначений
+    workerIds: task.assignments?.map(assignment => assignment.userId) || []
   }
+  
+  console.log('Selected worker IDs:', editingTask.value.workerIds)
   showEditDialog.value = true
 }
 
+// Закрытие диалога
 function closeEditDialog() {
   showEditDialog.value = false
   editingTask.value = null
 }
 
+// Удаление пользователя из выбранных
+function removeUser(userId) {
+  editingTask.value.workerIds = editingTask.value.workerIds.filter(id => id !== userId)
+}
+
+// Функция для удаления назначений через правильный API
+async function removeTaskAssignments(taskId, currentAssignments) {
+  try {
+    // Используем правильный API для удаления назначений
+    for (const assignment of currentAssignments) {
+      const response = await fetch(`http://localhost:3000/api/tasks/unassign-task-from-worker/${assignment.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: TOKEN,
+        },
+      })
+      
+      if (!response.ok) {
+        console.error(`Ошибка при удалении назначения ${assignment.id}:`, await response.text())
+      }
+    }
+  } catch (error) {
+    console.error('Ошибка при удалении назначений:', error)
+    throw error
+  }
+}
+
+// Сохранение задачи
 async function saveEditTask() {
   if (!editingTask.value.title || !editingTask.value.description) return
 
   try {
     isAddingTask.value = true
-    const response = await fetch(`http://localhost:3000/api/tasks/${editingTask.value.id}`, {
+    
+    // 1. Обновляем основную информацию о задаче
+    const taskResponse = await fetch(`http://localhost:3000/api/tasks/${editingTask.value.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -195,8 +322,18 @@ async function saveEditTask() {
       }),
     })
 
-    for (const workerId of editingTask.value.workerIds) {
-      await fetch(`http://localhost:3000/api/tasks/assign-task-worker`, {
+    if (!taskResponse.ok) {
+      throw new Error('Ошибка при обновлении задачи')
+    }
+
+    // 2. Удаляем все старые назначения через правильный API
+    if (editingTask.value.assignments && editingTask.value.assignments.length > 0) {
+      await removeTaskAssignments(editingTask.value.id, editingTask.value.assignments)
+    }
+
+    // 3. Добавляем новые назначения
+    for (const userId of editingTask.value.workerIds) {
+      const assignResponse = await fetch(`http://localhost:3000/api/tasks/assign-task-worker`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -204,23 +341,27 @@ async function saveEditTask() {
         },
         body: JSON.stringify({
           taskId: editingTask.value.id,
-          workerId,
+          userId: userId,
         }),
       })
+      
+      if (!assignResponse.ok) {
+        console.error(`Ошибка назначения пользователя ${userId}:`, await assignResponse.text())
+      }
     }
 
-
-    if (response.ok) {
-      await getTasks()
-      closeEditDialog()
-    } else {
-      console.error('Ошибка при обновлении:', await response.text())
-    }
+    // 4. Обновляем список задач и закрываем диалог
+    await getTasks()
+    closeEditDialog()
+    
+  } catch (error) {
+    console.error('Ошибка при сохранении:', error)
   } finally {
     isAddingTask.value = false
   }
 }
 
+// Удаление задачи
 async function deleteTask(taskId) {
   try {
     deletingTasks.value.push(taskId)
@@ -235,8 +376,38 @@ async function deleteTask(taskId) {
       await getTasks()
       tasks.value = tasks.value.filter(t => t.id !== taskId)
     }
+  } catch (error) {
+    console.error('Ошибка при удалении:', error)
   } finally {
     deletingTasks.value = deletingTasks.value.filter(id => id !== taskId)
+  }
+}
+
+// Утилиты для отображения
+function getRoleColor(role) {
+  switch (role) {
+    case 'admin': return 'red'
+    case 'manager': return 'blue'
+    case 'worker': return 'green'
+    default: return 'grey'
+  }
+}
+
+function getStatusColor(status) {
+  switch (status) {
+    case 'completed': return 'green'
+    case 'in_progress': return 'blue'
+    case 'pending': return 'orange'
+    default: return 'grey'
+  }
+}
+
+function getStatusText(status) {
+  switch (status) {
+    case 'completed': return 'Завершено'
+    case 'in_progress': return 'В процессе'
+    case 'pending': return 'Ожидает'
+    default: return status
   }
 }
 </script>

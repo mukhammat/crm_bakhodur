@@ -40,11 +40,11 @@ export class TaskController {
   };
 
   assignTaskToWorker = async (c: Context) => {
-    const { taskId, workerId } 
-    : { taskId: string, workerId: string } 
+    const { taskId, userId } 
+    : { taskId: string, userId: string } 
     = await c.req.json();
 
-    const taskAssignmentId = await this.taskService.assignTaskToWorker(taskId, workerId);
+    const taskAssignmentId = await this.taskService.assignTaskToWorker(taskId, userId);
 
     return c.json({ data: { taskAssignmentId }});
   }
