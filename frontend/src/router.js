@@ -1,12 +1,24 @@
 import { createRouter, createWebHistory } from "vue-router";
 
-import TaskManager from './components/tasks/TodoManager.vue';
+import DashboardPage from './components/DashboardPage.vue'
+import TaskManager from './components/tasks/TaskManager.vue';
+import UserManager from "./components/users/UserManager.vue";
 
 const routes = [
     {
       path: "/tasks",
       name: "tasks",
       component: TaskManager
+    },
+    {
+      path: "/user",
+      name: "users",
+      component: UserManager
+    },
+    {
+      path: "/",
+      name: "dashboard",
+      component: DashboardPage
     }
 ]
 

@@ -44,12 +44,23 @@ export class TaskService implements ITaskService {
       return this.db.query.tasks.findMany({
         where: eq(tasks.createdBy, createdBy),
         with: {
-          assignments: true
+          assignments: true,
         }
       });
     }
 
-    return this.db.query.tasks.findMany();
+    return this.db.query.tasks.findMany({
+      with: {
+        assignments: true,
+        createdBy: {
+          columns: {
+            hash: false,
+            id: true,
+            name: true,
+          }
+        }
+      }
+    });
   }
 
   public async update(

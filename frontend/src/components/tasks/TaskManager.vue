@@ -9,7 +9,7 @@ import TaskForm from './TaskForm.vue'
 import TaskList from './TaskList.vue'
 
 const TOKEN =
-  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjJkNzlhNzA1LTJhODQtNDkyMC1iYWNmLWI4OWRjNGJmNzkzYyIsImVtYWlsIjoiZG9zbmV0MjIwMEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTc2ODQ3NzEsImV4cCI6MTc1Nzc3MTE3MX0.oMFLBCQpimXcTFcgbbMEGx6s-ddseOuhMS_XRlSfr-Y' // вынеси в .env
+  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlkYTQwZmIzLWQ4MGQtNGNjNy05NzYwLWMzMzU1YTMxMTU1OCIsImVtYWlsIjoiZG9zbmV0MjIwMEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTc5NTU1MjEsImV4cCI6MTc1ODA0MTkyMX0.v9XsylKfH_Kjux08TFwHsNLykDUVZ-OEdKcveV0TAMo' // вынеси в .env
 
 
 const tasks = ref([])

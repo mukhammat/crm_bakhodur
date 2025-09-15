@@ -1,8 +1,6 @@
-import { type JwtVariables } from 'hono/jwt'
 import type { Context } from "hono";
 import type { ITaskService } from "./task.service.js";
-
-type ContextJWT = Context<{ Variables: JwtVariables<{ id: string }> }>;
+import type { ContextJWT } from '../../types/context-jwt.js'
 
 export class TaskController {
   constructor(private taskService: ITaskService) {}

@@ -3,11 +3,13 @@ import { redis } from "../../../cache/index.js";
 import { CustomError } from "../../errors/custom.error.js";
 import { users, type DrizzleClient } from "../../../database/index.js";
 import type { GetUserDto, UpdateDto } from "./user.dto.js";
+import { eq } from "drizzle-orm";
 
 export interface IUserService {
   generateRegisterKey(role: "manager" | "admin"): Promise<string>;
   getAll(): Promise<GetUserDto[]>
   update(userId: string, data: UpdateDto): Promise<string>
+  delete(userId: string): Promise<string>
 }
 
 export class UserService implements IUserService {
@@ -43,6 +45,14 @@ export class UserService implements IUserService {
     await this.db
     .update(users)
     .set(data)
+
+    return userId
+  }
+
+  public async delete(userId: string) {
+    await this.db
+    .delete(users)
+    .where(eq(users.id, userId))
 
     return userId
   }
