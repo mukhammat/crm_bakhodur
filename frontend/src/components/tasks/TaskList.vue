@@ -33,9 +33,9 @@
                     v-for="(assignment, i) in item.assignments"
                     :key="i"
                   >
-                    <v-list-item-title>
+                    <v-list-item-title class="text-body-2">
                       {{ assignment.user?.name || 'Без имени' }}
-                      <v-chip size="x-small" :color="getRoleColor(assignment.user?.role)" class="ml-2">
+                      <v-chip size="x-small" :color="getRoleColor(assignment.user?.role)" class="ml-1">
                         {{ assignment.user?.role }}
                       </v-chip>
                     </v-list-item-title>
@@ -198,11 +198,12 @@
 
 <script setup>
 import { ref, defineProps, toRef, onMounted } from 'vue'
+import { taskService } from '../../services/task.service.js'
 
 const TOKEN =
-  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlkYTQwZmIzLWQ4MGQtNGNjNy05NzYwLWMzMzU1YTMxMTU1OCIsImVtYWlsIjoiZG9zbmV0MjIwMEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTc5NTU1MjEsImV4cCI6MTc1ODA0MTkyMX0.v9XsylKfH_Kjux08TFwHsNLykDUVZ-OEdKcveV0TAMo'
+  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhYjZhMWNkLTMxMGQtNGEwMS1hZjYyLTE1MjU4MmEzODM4NyIsImVtYWlsIjoiZG9zbmV0MjIwMEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTc5OTMwMDgsImV4cCI6MTc1ODA3OTQwOH0.Ph25TFOjIApUGbwqOvinwcuPOuAWKlbhltDsZt4YS00'
 
-// получаем проп
+  // получаем проп
 const props = defineProps({
   tasks: Array,
   getTasks: Function
@@ -284,13 +285,7 @@ async function removeTaskAssignments(taskId, currentAssignments) {
   try {
     // Используем правильный API для удаления назначений
     for (const assignment of currentAssignments) {
-      const response = await fetch(`http://localhost:3000/api/tasks/unassign-task-from-worker/${assignment.id}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: TOKEN,
-        },
-      })
+      const response = await taskService.removeAssignment(assignment.id)
       
       if (!response.ok) {
         console.error(`Ошибка при удалении назначения ${assignment.id}:`, await response.text())
@@ -310,16 +305,9 @@ async function saveEditTask() {
     isAddingTask.value = true
     
     // 1. Обновляем основную информацию о задаче
-    const taskResponse = await fetch(`http://localhost:3000/api/tasks/${editingTask.value.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: TOKEN,
-      },
-      body: JSON.stringify({
-        title: editingTask.value.title,
-        description: editingTask.value.description,
-      }),
+    const taskResponse = await taskService.edit(editingTask.value.id, {
+      title: editingTask.value.title,
+      description: editingTask.value.description,
     })
 
     if (!taskResponse.ok) {
@@ -333,16 +321,9 @@ async function saveEditTask() {
 
     // 3. Добавляем новые назначения
     for (const userId of editingTask.value.workerIds) {
-      const assignResponse = await fetch(`http://localhost:3000/api/tasks/assign-task-worker`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: TOKEN,
-        },
-        body: JSON.stringify({
+      const assignResponse = await taskService.assignUser({
           taskId: editingTask.value.id,
           userId: userId,
-        }),
       })
       
       if (!assignResponse.ok) {
@@ -365,17 +346,9 @@ async function saveEditTask() {
 async function deleteTask(taskId) {
   try {
     deletingTasks.value.push(taskId)
-    const response = await fetch(`http://localhost:3000/api/tasks/${taskId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: TOKEN,
-      },
-    })
-    if (response.ok) {
-      await getTasks()
-      tasks.value = tasks.value.filter(t => t.id !== taskId)
-    }
+    await taskService.delete(taskId)
+    await getTasks()
+    tasks.value = tasks.value.filter(t => t.id !== taskId)
   } catch (error) {
     console.error('Ошибка при удалении:', error)
   } finally {

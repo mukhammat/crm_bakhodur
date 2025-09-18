@@ -72,8 +72,9 @@ const headers = [
 ]
 
 const TOKEN =
-  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjlkYTQwZmIzLWQ4MGQtNGNjNy05NzYwLWMzMzU1YTMxMTU1OCIsImVtYWlsIjoiZG9zbmV0MjIwMEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTc5NTU1MjEsImV4cCI6MTc1ODA0MTkyMX0.v9XsylKfH_Kjux08TFwHsNLykDUVZ-OEdKcveV0TAMo' // вынеси в .env
+  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhYjZhMWNkLTMxMGQtNGEwMS1hZjYyLTE1MjU4MmEzODM4NyIsImVtYWlsIjoiZG9zbmV0MjIwMEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTc5OTMwMDgsImV4cCI6MTc1ODA3OTQwOH0.Ph25TFOjIApUGbwqOvinwcuPOuAWKlbhltDsZt4YS00'
 
+  
 async function deleteTask(userId) {
   try {
     deletingUsers.value.push(userId)

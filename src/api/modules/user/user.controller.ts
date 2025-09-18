@@ -35,12 +35,16 @@ export class UserController {
   delete = async (c: ContextJWT) => {
     const userId = c.req.param('id');
     const { id } = c.get('jwtPayload');
-
+    console.log(userId);
+    console.log(id);
+    console.log(userId === id);
+    
     if(userId === id) {
       throw new CustomError('Вы не можете удалить себя!')
     }
+    console.log('Id', userId === id);
 
-    await this.userService.delete(id);
+    await this.userService.delete(userId);
 
     return c.json({ data: { id } });
   }
