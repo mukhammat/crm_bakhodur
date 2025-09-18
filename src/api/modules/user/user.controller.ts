@@ -48,4 +48,15 @@ export class UserController {
 
     return c.json({ data: { id } });
   }
+
+  me = async (c: ContextJWT) => {
+    const { id } = c.get('jwtPayload');
+
+    const user = await this.userService.getById(id);
+
+
+    return c.json({
+      data: user || null
+    })
+  }
 }

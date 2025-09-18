@@ -10,6 +10,7 @@ export interface IUserService {
   getAll(): Promise<GetUserDto[]>
   update(userId: string, data: UpdateDto): Promise<string>
   delete(userId: string): Promise<string>
+  getById(userId: string): Promise<GetUserDto | undefined>
 }
 
 export class UserService implements IUserService {
@@ -55,5 +56,14 @@ export class UserService implements IUserService {
     .where(eq(users.id, userId))
 
     return userId
+  }
+
+  public async getById(userId: string) {
+    return this.db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: {
+        hash: false
+      }
+    })
   }
 }
