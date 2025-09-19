@@ -1,17 +1,24 @@
 import { POSTGET } from "./helper/postget";
+import { useAuthStore } from "../stores/auth";
 
-class TaskService {
+class TaskApi {
     SERVER = 'http://localhost:3000';
-    TOKEN = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImYwZGQ2OWY1LTVjMjAtNGIxZi05MmRlLTNmYTQxZTcwMjI1NyIsImVtYWlsIjoiZG9zbmV0MjIwMEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTc5OTM0NzEsImV4cCI6MTc1ODA3OTg3MX0.3keYmEGxOrtDZ0fmUEmwRQK63tpvipiK60u7QxX4k70'
 
-    constructor() {}
+    constructor() {
+    }
+    
+    // динамический getter заголовков
+    get headers() {
+        this.auth = useAuthStore()
+        return {
+            Authorization: this.auth.token ? `Bearer ${this.auth.token}` : ''
+        }
+    }
 
     async add(body) {
         return POSTGET.request(`${this.SERVER}/api/tasks`, {
             method: 'POST',
-            headers: {
-                Authorization: this.TOKEN,
-            },
+            headers: this.headers,
             body,
         })
     }
@@ -19,18 +26,14 @@ class TaskService {
     async removeAssignment(assignmentId) {
         return POSTGET.request(`${this.SERVER}/api/tasks/unassign-task-from-worker/${assignmentId}`, {
             method: 'DELETE',
-            headers: {
-                Authorization: this.TOKEN,
-            },
+            headers: this.headers,
         })
     }
 
     async edit(editingTaskId, data) {
         return POSTGET.request(`${this.SERVER}/api/tasks/${editingTaskId}`, {
             method: 'PUT',
-            headers: {
-                Authorization: this.TOKEN,
-            },
+            headers: this.headers,
             body: data,
         })
     }
@@ -38,29 +41,23 @@ class TaskService {
     async delete(taskId) {
         return POSTGET.request(`${this.SERVER}/api/tasks/${taskId}`, {
             method: 'DELETE',
-            headers: {
-                Authorization: this.TOKEN,
-            },
+            headers: this.headers,
         })
     }
 
     async assignUser(body) {
         return POSTGET.request(`${this.SERVER}/api/tasks/assign-task-worker`, {
-        method: 'POST',
-        headers: {
-          Authorization: this.TOKEN,
-        },
-        body
-      })
+            method: 'POST',
+            headers: this.headers,
+            body
+        })
     }
 
     async getAll() {
         return POSTGET.request(`${this.SERVER}/api/tasks`, {
-            headers: {
-                Authorization: this.TOKEN,
-            },
+            headers: this.headers,
         })
     }
 }
 
-export const taskService = new TaskService();
+export const taskApi = new TaskApi();

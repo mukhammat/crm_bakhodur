@@ -198,10 +198,8 @@
 
 <script setup>
 import { ref, defineProps, toRef, onMounted } from 'vue'
-import { taskService } from '../../services/task.service.js'
-
-const TOKEN =
-  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhYjZhMWNkLTMxMGQtNGEwMS1hZjYyLTE1MjU4MmEzODM4NyIsImVtYWlsIjoiZG9zbmV0MjIwMEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTc5OTMwMDgsImV4cCI6MTc1ODA3OTQwOH0.Ph25TFOjIApUGbwqOvinwcuPOuAWKlbhltDsZt4YS00'
+import { taskApi } from '../../api/task.api.js'
+import { userApi } from '../../api/user.api.js'
 
   // получаем проп
 const props = defineProps({
@@ -223,13 +221,7 @@ const loadingUsers = ref(false)
 async function getUsers() {
   try {
     loadingUsers.value = true
-    const response = await fetch(`http://localhost:3000/api/users`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: TOKEN,
-      },
-    })
+    const response = await userApi.getAll()
 
     const data = await response.json()
     console.log('Users loaded:', data.data.users)
@@ -285,7 +277,7 @@ async function removeTaskAssignments(taskId, currentAssignments) {
   try {
     // Используем правильный API для удаления назначений
     for (const assignment of currentAssignments) {
-      const response = await taskService.removeAssignment(assignment.id)
+      const response = await taskApi.removeAssignment(assignment.id)
       
       if (!response.ok) {
         console.error(`Ошибка при удалении назначения ${assignment.id}:`, await response.text())
@@ -305,7 +297,7 @@ async function saveEditTask() {
     isAddingTask.value = true
     
     // 1. Обновляем основную информацию о задаче
-    const taskResponse = await taskService.edit(editingTask.value.id, {
+    const taskResponse = await taskApi.edit(editingTask.value.id, {
       title: editingTask.value.title,
       description: editingTask.value.description,
     })
@@ -321,7 +313,7 @@ async function saveEditTask() {
 
     // 3. Добавляем новые назначения
     for (const userId of editingTask.value.workerIds) {
-      const assignResponse = await taskService.assignUser({
+      const assignResponse = await taskApi.assignUser({
           taskId: editingTask.value.id,
           userId: userId,
       })
@@ -346,7 +338,7 @@ async function saveEditTask() {
 async function deleteTask(taskId) {
   try {
     deletingTasks.value.push(taskId)
-    await taskService.delete(taskId)
+    await taskApi.delete(taskId)
     await getTasks()
     tasks.value = tasks.value.filter(t => t.id !== taskId)
   } catch (error) {

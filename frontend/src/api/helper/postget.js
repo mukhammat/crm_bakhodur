@@ -55,13 +55,13 @@ export class POSTGET {
             });
     
             if (!response.ok) {
-                throw new Error(data?.message || `Ошибка ${response.status}`);
+                throw new Error(response?.message || `Ошибка ${response.status}`);
             }
     
             return response;
             
         } catch (error) {
-            console.log(error?.message || `Ошибка ${response.status}`)
+            console.log(error?.message)
             throw error
         }
     }

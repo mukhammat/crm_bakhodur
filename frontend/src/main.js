@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import { createPinia } from 'pinia'
 
 // Vuetify
 import 'vuetify/styles' // глобальные стили
@@ -14,6 +15,7 @@ const vuetify = createVuetify({
 })
 
 createApp(App)
+  .use(createPinia())
   .use(router)
   .use(vuetify)
   .mount('#app')

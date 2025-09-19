@@ -30,7 +30,7 @@
 
 <script setup>
 import { ref, defineProps } from 'vue'
-import { taskService } from '../../services/task.service.js'
+import { taskApi } from '../../api/task.api.js'
 
 
 const newTask = ref({
@@ -51,7 +51,7 @@ async function addTask() {
 
   try {
     isAddingTask.value = true
-    const response = await taskService.add(newTask.value);
+    const response = await taskApi.add(newTask.value);
     if (response.ok) {
       closeAddDialog()
       await getTasks();

@@ -7,13 +7,13 @@
 import { ref, onMounted } from 'vue'
 import TaskForm from './TaskForm.vue'
 import TaskList from './TaskList.vue'
-import { taskService } from '../../services/task.service.js'
+import { taskApi } from '../../api/task.api.js'
 
 const tasks = ref([])
 
 async function getTasks() {
   try {
-    const response = await taskService.getAll();
+    const response = await taskApi.getAll();
     const data = await response.json()
     tasks.value = data.data.tasks
     console.log(data.data.tasks)
