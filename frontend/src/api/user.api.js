@@ -17,7 +17,6 @@ class UserApi{
         return POSTGET.request(`${this.SERVER}/api/user/me`, {
             method: 'GET',
             headers: this.headers,
-            body,
         })
     }
 
@@ -25,7 +24,13 @@ class UserApi{
         return POSTGET.request(`${this.SERVER}/api/users`, {
             method: 'GET',
             headers: this.headers,
-            body,
+        })
+    }
+
+    async delete(userId) {
+        return POSTGET.request(`${this.SERVER}/api/users/${userId}`, {
+            method: 'DELETE',
+            headers: this.headers,
         })
     }
 

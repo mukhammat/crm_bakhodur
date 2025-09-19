@@ -11,9 +11,10 @@ const routes = [
       path: "/tasks",
       name: "tasks",
       component: TaskManager
+      
     },
     {
-      path: "/user",
+      path: "/users",
       name: "users",
       component: UserManager
     },
@@ -25,7 +26,8 @@ const routes = [
     {
       path: '/login',
       name: 'login',
-      component: LoginPage
+      component: LoginPage,
+      meta: { hideHeader: true }
     }
 ]
 

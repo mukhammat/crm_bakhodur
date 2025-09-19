@@ -50,6 +50,7 @@
 
 <script setup>
 import { ref, defineProps, toRef } from 'vue'
+import { userApi } from '../../api/user.api.js'
 
 // получаем проп
 const props = defineProps({
@@ -70,21 +71,11 @@ const headers = [
   { title: 'Активный', key: 'isActive' },
   { title: 'Действия', key: 'actions', sortable: false },
 ]
-
-const TOKEN =
-  'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVhYjZhMWNkLTMxMGQtNGEwMS1hZjYyLTE1MjU4MmEzODM4NyIsImVtYWlsIjoiZG9zbmV0MjIwMEBnbWFpbC5jb20iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NTc5OTMwMDgsImV4cCI6MTc1ODA3OTQwOH0.Ph25TFOjIApUGbwqOvinwcuPOuAWKlbhltDsZt4YS00'
-
   
 async function deleteTask(userId) {
   try {
     deletingUsers.value.push(userId)
-    const response = await fetch(`http://localhost:3000/api/users/${userId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: TOKEN,
-      },
-    })
+    const response = await userApi.delete(userId);
     if (response.ok) {
       await getUsers()
       users.value = users.value.filter(t => t.id !== userId)

@@ -1,29 +1,15 @@
 <template>
   <v-app>
-    <AppHeader />
+    <AppHeader v-if="!route.meta.hideHeader" />
     <v-main>
       <router-view />
     </v-main>
   </v-app>
 </template>
 
-<script>
+<script setup>
+import { useRoute } from 'vue-router'
 import AppHeader from './layout/AppHeader.vue'
 
-export default {
-  name: 'App',
-  components: {
-    AppHeader
-  }
-}
+const route = useRoute()
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-</style>
