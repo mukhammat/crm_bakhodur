@@ -53,8 +53,9 @@ class TaskApi {
         })
     }
 
-    async getAll() {
-        return POSTGET.request(`${this.SERVER}/api/tasks`, {
+    async getAll(params = {}) {
+        const query = new URLSearchParams(params).toString()
+        return POSTGET.request(`${this.SERVER}/api/tasks${query ? `?${query}` : ''}`, {
             headers: this.headers,
         })
     }

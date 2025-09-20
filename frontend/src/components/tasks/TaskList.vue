@@ -23,8 +23,8 @@
             <template #item.assignments.worker="{ item }">
               <v-menu>
                 <template #activator="{ props }">
-                  <v-btn v-bind="props" color="primary" size="small">
-                    Пользователи ({{ item.assignments?.length || 0 }})
+                  <v-btn v-bind="props" color="green" size="small">
+                    {{ (item.assignments.length === 0) ? 'Не назначен' : item.assignments[0]?.user?.name + '...' }}
                   </v-btn>
                 </template>
 
@@ -35,9 +35,6 @@
                   >
                     <v-list-item-title class="text-body-2">
                       {{ assignment.user?.name || 'Без имени' }}
-                      <v-chip size="x-small" :color="getRoleColor(assignment.user?.role)" class="ml-1">
-                        {{ assignment.user?.role }}
-                      </v-chip>
                     </v-list-item-title>
                   </v-list-item>
                   <v-list-item v-if="!item.assignments || item.assignments.length === 0">
