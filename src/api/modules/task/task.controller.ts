@@ -21,8 +21,8 @@ export class TaskController {
   };
 
   getAll = async (c: Context) => {
-    const createdBy = c.req.query("createdBy");
-    const tasks = await this.taskService.getAll(createdBy || undefined);
+    const params = c.req.query();
+    const tasks = await this.taskService.getAll(params);
     return c.json({ data: { tasks } });
   };
 

@@ -1,12 +1,12 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { taskAssignments, tasks, type DrizzleClient } from "../../../database/index.js";
 import { CustomError } from "../../errors/custom.error.js";
-import type { CreateDto, UpdateDto } from "./task.dto.js";
+import type { CreateDto, ParamsType, UpdateDto } from "./task.dto.js";
 
 export interface ITaskService {
   create(data: CreateDto): Promise<string>;
   getById(id: string): Promise<typeof tasks.$inferSelect | null>;
-  getAll(createdBy?: string): Promise<typeof tasks.$inferSelect[]>;
+  getAll(params?: ParamsType): Promise<typeof tasks.$inferSelect[]>;
   update( id: string, data: UpdateDto ): Promise<string>;
   delete(id: string): Promise<string>;
   assignTaskToWorker(taskId: string, workerId: string): Promise<string>
@@ -39,25 +39,27 @@ export class TaskService implements ITaskService {
     return task;
   }
 
-  public async getAll(createdBy?: string) {
-    if (createdBy) {
-      return this.db.query.tasks.findMany({
-        where: eq(tasks.createdBy, createdBy),
-        with: {
-          assignments: {
-            with: {
-              user: {
-                columns: {
-                  hash: false
-                }
-              }
-            }
-          },
-        }
-      });
+  public async getAll(params?: ParamsType) {
+    const eqs = [];
+
+    if(params?.createdBy) {
+      eqs.push(eq(tasks.createdBy, params.createdBy))
+    }
+
+    if(params?.status) {
+      eqs.push(eq(tasks.status, params.status))
+    }
+
+    if(params?.priority) {
+      eqs.push(eq(tasks.priority, params.priority))
+    }
+
+    if(params?.dueDate) {
+      eqs.push(eq(tasks.dueDate, params.dueDate))
     }
 
     return this.db.query.tasks.findMany({
+      where: and(...eqs),
       with: {
         assignments: {
           with: {
@@ -76,7 +78,8 @@ export class TaskService implements ITaskService {
             name: true,
           }
         }
-      }
+      },
+      offset: params?.offset
     });
   }
 

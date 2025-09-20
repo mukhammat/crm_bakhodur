@@ -103,6 +103,16 @@
             class="mb-4"
           />
 
+          <v-select
+            v-model="editingTask.status"
+            :items="statusOptions"
+            item-title="label"
+            item-value="value"
+            label="Статус задачи"
+            class="mb-4"
+          />
+
+
           <!-- Выбор пользователей -->
           <v-select
             v-model="editingTask.workerIds"
@@ -201,6 +211,12 @@ import { ref, defineProps, toRef, onMounted } from 'vue'
 import { taskApi } from '../../api/task.api.js'
 import { userApi } from '../../api/user.api.js'
 
+const statusOptions = [
+  { label: 'Ожидает', value: 'pending' },
+  { label: 'В процессе', value: 'in_progress' },
+  { label: 'Завершено', value: 'completed' }
+]
+
   // получаем проп
 const props = defineProps({
   tasks: Array,
@@ -291,7 +307,7 @@ async function removeTaskAssignments(taskId, currentAssignments) {
 
 // Сохранение задачи
 async function saveEditTask() {
-  if (!editingTask.value.title || !editingTask.value.description) return
+  if (!editingTask.value.title || !editingTask.value.description ||  !editingTask.value.status) return
 
   try {
     isAddingTask.value = true
@@ -300,6 +316,7 @@ async function saveEditTask() {
     const taskResponse = await taskApi.edit(editingTask.value.id, {
       title: editingTask.value.title,
       description: editingTask.value.description,
+      status: editingTask.value.status
     })
 
     if (!taskResponse.ok) {
