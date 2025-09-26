@@ -1,6 +1,7 @@
 import type { Context } from "hono";
 import type { ITaskService } from "./task.service.js";
 import type { ContextJWT } from '../../types/context-jwt.js'
+import { eventBus } from '../../../event-bus.js'
 
 export class TaskController {
   constructor(private taskService: ITaskService) {}
@@ -45,7 +46,7 @@ export class TaskController {
     = await c.req.json();
 
     const taskAssignmentId = await this.taskService.assignTaskToWorker(taskId, userId);
-
+    eventBus.emit('task.assigned', { taskId, userId });
     return c.json({ data: { taskAssignmentId }});
   }
 

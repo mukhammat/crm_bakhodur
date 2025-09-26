@@ -23,7 +23,41 @@ bot.command('register', registerCommand)
 bot.use(requireAuthMiddleware)
 bot.command('start', startCommand)
 
+import { eventBus } from '../event-bus.js'
+import db, { tasks, workers } from "../database/index.js";
+import { eq } from "drizzle-orm";
 
+eventBus.on('task.assigned', async (data) => {
+  try {
+    const { taskId, userId } = data;
+    console.log('Assigning task:', data);
+  
+    const task = await db.query.tasks.findFirst({
+      where: eq(tasks.id, taskId),
+    });
+  
+    const worker = await db.query.workers.findFirst({
+      where: eq(workers.userId, userId),
+      columns: {
+        telegramId: true,
+      }
+    });
+
+    if(!worker?.telegramId) {
+      console.log('User does not have a telegramId, skipping notification.');
+      return;
+    }
+
+    console.log('Found user:', worker);
+
+    await bot.api.sendMessage(worker.telegramId, `A new task has been assigned to you: ${task?.title}`);
+
+    console.log('Task assigned:', data);
+    
+  } catch (error) {
+    console.error('Error assigning task:', error);
+  }
+});
 
 bot.on("message", (ctx) => ctx.reply("Got another message!"));
 

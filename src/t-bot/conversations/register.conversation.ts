@@ -1,5 +1,5 @@
 import type { Conversation } from "../types/grammy.type.js";
-import db, { users } from "../../database/index.js";
+import db, { users, workers } from "../../database/index.js";
 import type { Context } from "grammy";
 import { redis } from '../../cache/redis.js'
 
@@ -24,10 +24,18 @@ export async function registerConversation(conversation: Conversation, ctx: Cont
 
     const name = ctx.from?.first_name || ctx.from?.username || "Неизвестный пользователь";
 
-    await db.insert(users).values({
+    const [user] = await db.insert(users).values({
         email: ctx.chat?.id.toString() || "",
         hash: "0",
         name,
+        role: role,
+    }).returning({
+        id: users.id,
+    });
+
+    await db.insert(workers).values({
+        userId: user.id,
+        telegramId: ctx.chatId || 0
     });
 
     await ctx.reply("Вы успешно зарегистрированы ✅");
