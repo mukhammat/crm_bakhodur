@@ -9,11 +9,13 @@
     "migrate": "npx drizzle-kit migrate"
   },
   "dependencies": {
+    "@grammyjs/conversations": "^2.1.0",
     "@hono/node-server": "^1.19.0",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.2",
     "drizzle-orm": "^0.44.5",
     "drizzle-seed": "^0.3.1",
+    "grammy": "^1.38.2",
     "hono": "^4.9.6",
     "ioredis": "^5.7.0",
     "jsonwebtoken": "^9.0.2",

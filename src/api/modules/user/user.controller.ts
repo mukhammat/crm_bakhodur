@@ -10,7 +10,7 @@ export class UserController {
   generateRegisterKey = async (c: Context) => {
     const role = c.req.param("role");
 
-    if (!role || (role !== "manager" && role !== "admin")) {
+    if (!role || (role !== "manager" && role !== "admin" && role !== "worker")) {
       return c.json({ error: "Укажите ?role=manager или ?role=admin" }, 400);
     }
 

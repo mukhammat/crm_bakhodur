@@ -2,11 +2,11 @@ import { randomBytes } from "crypto";
 import { redis } from "../../../cache/index.js";
 import { CustomError } from "../../errors/custom.error.js";
 import { users, type DrizzleClient } from "../../../database/index.js";
-import type { GetUserDto, UpdateDto } from "./user.dto.js";
+import type { GetUserDto, RoleDto, UpdateDto } from "./user.dto.js";
 import { eq } from "drizzle-orm";
 
 export interface IUserService {
-  generateRegisterKey(role: "manager" | "admin"): Promise<string>;
+  generateRegisterKey(role: RoleDto): Promise<string>;
   getAll(): Promise<GetUserDto[]>
   update(userId: string, data: UpdateDto): Promise<string>
   delete(userId: string): Promise<string>
@@ -16,9 +16,9 @@ export interface IUserService {
 export class UserService implements IUserService {
   constructor(private db: DrizzleClient) {}
 
-  public async generateRegisterKey(role: "manager" | "admin") {
+  public async generateRegisterKey(role: RoleDto) {
 
-    if (!["manager", "admin"].includes(role)) {
+    if (!["manager", "admin", "worker"].includes(role)) {
       throw new CustomError("Недопустимая роль для регистрации!");
     }
 
