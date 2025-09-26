@@ -1,10 +1,12 @@
 <template>
     <UserList :getUsers="getUsers" :users="users" />
+    <GenerateKey />
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import UserList from './UserList.vue'
+import GenerateKey from './GenerateKey.vue'
 import { userApi } from '../../api/user.api.js'
 
 const users = ref([])

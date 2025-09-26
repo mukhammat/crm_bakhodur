@@ -3,11 +3,6 @@
     "target": "es5",
     "module": "esnext",
     "baseUrl": "./",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
     "lib": [
       "esnext",
       "dom",

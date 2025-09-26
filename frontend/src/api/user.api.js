@@ -34,7 +34,12 @@ class UserApi{
         })
     }
 
-
+    async generateKey(role) {
+        return POSTGET.request(`${this.SERVER}/api/users/register-key/${role}`, {
+            method: 'GET',
+            headers: this.headers,
+        })
+    }
 }
 
 export const userApi = new UserApi();
