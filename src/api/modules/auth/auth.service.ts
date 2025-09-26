@@ -57,9 +57,9 @@ export class AuthService implements IAuthService {
         key
     }: RegisterDto) {
         const role = await redis.get(`register_key:${key}`);
-        console.log(role)
-        if ( 
-            role !== 'manager' && role !== 'admin'
+
+        if (
+            role !== 'manager'
         ) {
             throw new CustomError('Ключь регистраций не найден!');
         }
