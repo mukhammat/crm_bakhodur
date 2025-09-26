@@ -365,7 +365,6 @@ async function deleteTask(taskId) {
 // Утилиты для отображения
 function getRoleColor(role) {
   switch (role) {
-    case 'admin': return 'red'
     case 'manager': return 'blue'
     case 'worker': return 'green'
     default: return 'grey'

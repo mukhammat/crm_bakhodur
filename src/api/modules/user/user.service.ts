@@ -17,8 +17,7 @@ export class UserService implements IUserService {
   constructor(private db: DrizzleClient) {}
 
   public async generateRegisterKey(role: RoleDto) {
-
-    if (!["manager", "admin", "worker"].includes(role)) {
+    if (!["manager", "worker", "admin"].includes(role)) {
       throw new CustomError("Недопустимая роль для регистрации!");
     }
 
@@ -38,7 +37,7 @@ export class UserService implements IUserService {
     .findMany({
       columns: {
         hash: false
-      }
+      },
     })
   }
 

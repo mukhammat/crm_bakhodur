@@ -144,7 +144,6 @@ const errorMessage = ref('')
 
 // Роли
 const roles = [
-  { title: 'Администратор', value: 'admin' },
   { title: 'Менеджер', value: 'manager' },
   { title: 'Работник', value: 'worker' }
 ]
@@ -206,7 +205,6 @@ const shareKey = async () => {
 // Получить цвет для роли
 const getRoleColor = (role) => {
   const colors = {
-    admin: 'red',
     manager: 'orange',
     worker: 'blue'
   }

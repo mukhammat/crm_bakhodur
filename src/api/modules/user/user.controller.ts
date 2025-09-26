@@ -10,8 +10,8 @@ export class UserController {
   generateRegisterKey = async (c: Context) => {
     const role = c.req.param("role");
 
-    if (!role || (role !== "manager" && role !== "admin" && role !== "worker")) {
-      return c.json({ error: "Укажите ?role=manager или ?role=admin" }, 400);
+    if (!role || (role !== "manager" && role !== "worker")) {
+      return c.json({ error: "Укажите ?role=manager или ?role=worker" }, 400);
     }
 
     const key = await this.userService.generateRegisterKey(role);
@@ -35,14 +35,10 @@ export class UserController {
   delete = async (c: ContextJWT) => {
     const userId = c.req.param('id');
     const { id } = c.get('jwtPayload');
-    console.log(userId);
-    console.log(id);
-    console.log(userId === id);
     
     if(userId === id) {
       throw new CustomError('Вы не можете удалить себя!')
     }
-    console.log('Id', userId === id);
 
     await this.userService.delete(userId);
 
@@ -53,7 +49,6 @@ export class UserController {
     const { id } = c.get('jwtPayload');
 
     const user = await this.userService.getById(id);
-
 
     return c.json({
       data: user || null
