@@ -2,12 +2,12 @@ import { randomBytes } from "crypto";
 import { redis } from "../../../cache/index.js";
 import { CustomError } from "../../errors/custom.error.js";
 import { users, type DrizzleClient } from "../../../database/index.js";
-import type { GetUserDto, RoleDto, UpdateDto } from "./user.dto.js";
-import { eq } from "drizzle-orm";
+import type { GetUserDto, ParamsType, RoleDto, UpdateDto } from "./user.dto.js";
+import { and, eq } from "drizzle-orm";
 
 export interface IUserService {
   generateRegisterKey(role: RoleDto): Promise<string>;
-  getAll(): Promise<GetUserDto[]>
+  getAll(params?: ParamsType): Promise<GetUserDto[]>
   update(userId: string, data: UpdateDto): Promise<string>
   delete(userId: string): Promise<string>
   getById(userId: string): Promise<GetUserDto | undefined>
@@ -30,7 +30,13 @@ export class UserService implements IUserService {
     return key;
   }
 
-  public async getAll() {
+  public async getAll(params?: ParamsType) {
+    const eqs = [];
+
+    if(params?.role) {
+      eqs.push(eq(users.role, params.role))
+    }
+
     return this.db
     .query
     .users
@@ -38,6 +44,7 @@ export class UserService implements IUserService {
       columns: {
         hash: false
       },
+      where: and(...eqs)
     })
   }
 

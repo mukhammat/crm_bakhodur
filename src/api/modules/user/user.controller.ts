@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import type { ContextJWT } from '../../types/context-jwt.js'
 import type { IUserService } from "./user.service.js";
-import type { UpdateDto } from "./user.dto.js";
+import type { RoleDto, UpdateDto } from "./user.dto.js";
 import { CustomError } from "../../errors/custom.error.js";
 
 export class UserController {
@@ -18,8 +18,16 @@ export class UserController {
     return c.json({ data: { key } });
   };
 
-  getAll = async (c: Context) => {
-    const users = await this.userService.getAll();
+  getAll = async (c: ContextJWT) => {
+    const { role } = c.get('jwtPayload');
+
+    const params: { role?: RoleDto } = { };
+
+    if(role !== 'admin') {
+      params.role = 'worker';
+    }
+
+    const users = await this.userService.getAll(params);
     return c.json({ data: { users } });
   }
 
