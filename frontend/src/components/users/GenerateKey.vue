@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-row justify="center">
-      <v-col cols="10" md="5">
+      <v-col v-if="!isAdmin" cols="10" md="5">
         <v-card>
           <v-card-title>Сгенерировать ключ</v-card-title>
           <v-card-text>

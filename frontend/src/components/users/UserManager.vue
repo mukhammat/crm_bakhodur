@@ -1,9 +1,12 @@
 <template>
     <UserList :getUsers="getUsers" :users="users" />
-    <GenerateKey />
+    <GenerateKey v-if="isAdmin" />
 </template>
 
 <script setup>
+import { usePermissions } from '../../composables/usePermissions.js'
+const { isAdmin } = usePermissions()
+
 import { ref, onMounted } from 'vue'
 import UserList from './UserList.vue'
 import GenerateKey from './GenerateKey.vue'
