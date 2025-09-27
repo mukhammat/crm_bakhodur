@@ -1,4 +1,4 @@
-import { Bot } from "grammy";
+import { Bot, InlineKeyboard } from "grammy";
 import {
   conversations,
   createConversation
@@ -35,7 +35,12 @@ eventBus.on('task.assigned', async (data) => {
     const task = await db.query.tasks.findFirst({
       where: eq(tasks.id, taskId),
     });
-  
+
+    if(task?.status !== 'pending') {
+      console.log('Task is not pending, skipping notification.');
+      return;
+    }
+
     const worker = await db.query.workers.findFirst({
       where: eq(workers.userId, userId),
       columns: {
@@ -50,7 +55,12 @@ eventBus.on('task.assigned', async (data) => {
 
     console.log('Found user:', worker);
 
-    await bot.api.sendMessage(worker.telegramId, `A new task has been assigned to you: ${task?.title}`);
+    const inline = new InlineKeyboard()
+    .text('Приступить', `take`)
+
+    await bot.api.sendMessage(worker.telegramId, `Новая задача: ${task?.title}\n${task?.description}`, {
+      reply_markup: inline
+    });
 
     console.log('Task assigned:', data);
     
@@ -59,7 +69,12 @@ eventBus.on('task.assigned', async (data) => {
   }
 });
 
-bot.on("message", (ctx) => ctx.reply("Got another message!"));
+bot.callbackQuery('take', async (ctx) => {
+  await db.update(tasks).set({
+    'status': 'in_progress',
+  })
+  await ctx.answerCallbackQuery('Вы приступили к задаче!');
+});
 
 // Start the bot.
 bot.start();
