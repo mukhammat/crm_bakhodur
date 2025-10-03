@@ -1,4 +1,4 @@
-import { Bot, InlineKeyboard } from "grammy";
+import { Bot } from "grammy";
 import {
   conversations,
   createConversation
@@ -12,69 +12,32 @@ const bot: MyBot = new Bot(TOKEN)
 bot.use(conversations())
 
 // Concertaions
-import { registerConversation } from "./conversations/register.conversation.js";
-bot.use(createConversation(registerConversation));
+import { AuthController } from './controllers/auth.controller.js'
+const authController = new AuthController()
+
+bot.use(createConversation(authController.registerConversation));
 
 // Commands
+import db from "../database/index.js";
+import { TaskService }  from '../core/services/task.service.js'
+import { UserService }  from '../core/services/user.service.js'
+import { TaskController } from './controllers/task.controller.js'
 import { startCommand } from './commands/start.command.js'
 import { requireAuthMiddleware } from "./middlewares/require-auth.middleware.js";
+
+const taskService = new TaskService(db);
+const userService =  new UserService(db);
+const taskController = new TaskController(taskService, userService)
 
 bot.command('register', registerCommand)
 bot.use(requireAuthMiddleware)
 bot.command('start', startCommand)
+bot.command('mytasks', taskController.myTasks)
 
-import { eventBus } from '../event-bus.js'
-import db, { tasks, workers } from "../database/index.js";
-import { eq } from "drizzle-orm";
+import { notificationEvents } from './events/notification.events.js'
 
-eventBus.on('task.assigned', async (data) => {
-  try {
-    const { taskId, userId } = data;
-    console.log('Assigning task:', data);
-  
-    const task = await db.query.tasks.findFirst({
-      where: eq(tasks.id, taskId),
-    });
 
-    if(task?.status !== 'pending') {
-      console.log('Task is not pending, skipping notification.');
-      return;
-    }
-
-    const worker = await db.query.workers.findFirst({
-      where: eq(workers.userId, userId),
-      columns: {
-        telegramId: true,
-      }
-    });
-
-    if(!worker?.telegramId) {
-      console.log('User does not have a telegramId, skipping notification.');
-      return;
-    }
-
-    console.log('Found user:', worker);
-
-    const inline = new InlineKeyboard()
-    .text('Приступить', `take`)
-
-    await bot.api.sendMessage(worker.telegramId, `Новая задача: ${task?.title}\n${task?.description}`, {
-      reply_markup: inline
-    });
-
-    console.log('Task assigned:', data);
-    
-  } catch (error) {
-    console.error('Error assigning task:', error);
-  }
-});
-
-bot.callbackQuery('take', async (ctx) => {
-  await db.update(tasks).set({
-    'status': 'in_progress',
-  })
-  await ctx.answerCallbackQuery('Вы приступили к задаче!');
-});
+notificationEvents(bot)
 
 // Start the bot.
 bot.start();

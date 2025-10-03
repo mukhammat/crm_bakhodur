@@ -1,6 +1,5 @@
-import { DrizzleQueryError } from "drizzle-orm/errors";
 import { type ErrorHandler } from "hono";
-import { CustomError } from "../errors/custom.error.js";
+import { CustomError } from "../../core/errors/custom.error.js";
 
 export const errorHandler: ErrorHandler = (err, c) => {
   let message = 'Internal Server Error';

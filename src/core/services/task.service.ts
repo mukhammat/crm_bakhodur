@@ -9,8 +9,9 @@ export interface ITaskService {
   getAll(params?: ParamsType): Promise<typeof tasks.$inferSelect[]>;
   update( id: string, data: UpdateDto ): Promise<string>;
   delete(id: string): Promise<string>;
-  assignTaskToWorker(taskId: string, workerId: string): Promise<string>
-  unassignTaskFromWorker(taskAssignmentId: string): Promise<string>
+  assignTaskToUser(taskId: string, userId: string): Promise<string>
+  unassignTaskFromUser(taskAssignmentId: string): Promise<string>
+  getAssignmentById(id: string): Promise<typeof taskAssignments.$inferSelect[] | undefined>
 }
 
 export class TaskService implements ITaskService {
@@ -68,7 +69,7 @@ export class TaskService implements ITaskService {
                   hash: false,
                   name: true
                 }
-            }
+            },
           }
         },
         createdBy: {
@@ -110,7 +111,7 @@ export class TaskService implements ITaskService {
     return deleted[0].id
   }
 
-  public async assignTaskToWorker(taskId: string, userId: string) {
+  public async assignTaskToUser(taskId: string, userId: string) {
     const [ asign ] = await this.db
     .insert(taskAssignments)
     .values({
@@ -124,7 +125,7 @@ export class TaskService implements ITaskService {
     return asign.id
   }
 
-  public async unassignTaskFromWorker(taskAssignmentId: string) {
+  public async unassignTaskFromUser(taskAssignmentId: string) {
     const [ asign ] = await this.db
     .delete(taskAssignments)
     .where(eq(taskAssignments.id, taskAssignmentId))
@@ -133,5 +134,14 @@ export class TaskService implements ITaskService {
     })
 
     return asign.id
+  }
+
+  public async getAssignmentById(id: string) {
+    return this.db.query.taskAssignments.findMany({
+      where: eq(taskAssignments.userId, id),
+      with: {
+        task: true
+      }
+    })
   }
 }

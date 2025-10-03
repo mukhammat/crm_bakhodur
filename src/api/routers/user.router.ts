@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import { UserService } from "./user.service.js";
-import { UserController } from "./user.controller.js";
-import { requireAuth } from '../../middleware/require-auth.js'
-import { requireRole } from '../../middleware/require-role.js'
-import type { DrizzleClient } from "../../../database/index.js";
+import { UserService } from "../../core/services/user.service.js";
+import { UserController } from "../controllers/user.controller.js";
+import { requireAuth } from '../middleware/require-auth.js'
+import { requireRole } from '../middleware/require-role.js'
+import type { DrizzleClient } from "../../database/index.js";
 
 export const userRouter = (db: DrizzleClient) => {
   const userController = new UserController(new UserService(db));

@@ -7,7 +7,12 @@ import { redis } from '../../cache/index.js'
 import type { RegisterDto } from "../dto/auth.dto.js";
 import { CustomError } from "../errors/custom.error.js";
 
-export class AuthService {
+export interface IAuthService {
+    login(email: string, password: string): Promise<string>;
+    register(dto: RegisterDto): Promise<string>;
+}
+
+export class AuthService implements IAuthService {
     private secretKey = process.env.SECRET_KEY;
     private saltRounds = 10;
 

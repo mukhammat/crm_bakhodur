@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import type { IAuthService } from "./auth.service.js";
+import type { IAuthService } from "../../core/services/auth.service.js";
 
 export class AuthController {
     constructor(private authService: IAuthService) {}

@@ -1,8 +1,7 @@
 import type { Context } from "hono";
-import type { ContextJWT } from '../../types/context-jwt.js'
-import type { IUserService } from "./user.service.js";
-import type { RoleDto, UpdateDto } from "./user.dto.js";
-import { CustomError } from "../../errors/custom.error.js";
+import type { ContextJWT } from '../types/context-jwt.js'
+import type { IUserService } from "../../core/services/user.service.js";
+import type { RoleDto, UpdateDto } from "../../core/dto/user.dto.js";
 
 export class UserController {
   constructor(private userService: IUserService) {}
@@ -45,7 +44,7 @@ export class UserController {
     const { id } = c.get('jwtPayload');
     
     if(userId === id) {
-      throw new CustomError('Вы не можете удалить себя!')
+      return c.json({ error: 'Вы не можете удалить себя!' }, 400);
     }
 
     await this.userService.delete(userId);

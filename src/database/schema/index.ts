@@ -11,28 +11,8 @@ export const users = table("users", {
   hash: t.varchar('hash').notNull(),
   name: t.varchar('name', { length: 100 }).notNull(),
   isActive: t.boolean('is_active').notNull().default(true),
+  telegramId: t.integer('telegram_id').unique(),
 });
-
-
-export const workers = table("workers", {
-  id: t.uuid().primaryKey().notNull().defaultRandom(),
-  userId: t.uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }).unique(),
-  telegramId: t.integer('telegram_id').notNull().unique(),
-});
-
-export const usersRelations = relations(users, ({ one }) => ({
-  worker: one(workers, {
-    fields: [users.id],
-    references: [workers.userId],
-  }),
-}));
-
-export const workersRelations = relations(workers, ({ one }) => ({
-  user: one(users, {
-    fields: [workers.userId],
-    references: [users.id],
-  }),
-}));
 
 export const taskStatusEnum = t.pgEnum('task_status', ['pending', 'in_progress', 'completed']);
 

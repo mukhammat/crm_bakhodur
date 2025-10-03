@@ -11,6 +11,7 @@ export interface IUserService {
   update(userId: string, data: UpdateDto): Promise<string>
   delete(userId: string): Promise<string>
   getById(userId: string): Promise<GetUserDto | undefined>
+  getByTelegramId(telegramId: number): Promise<{ id: string } | undefined>
 }
 
 export class UserService implements IUserService {
@@ -69,6 +70,15 @@ export class UserService implements IUserService {
       where: eq(users.id, userId),
       columns: {
         hash: false
+      }
+    })
+  }
+
+  public async getByTelegramId(telegramId: number) {
+    return this.db.query.users.findFirst({
+      where: eq(users.telegramId, telegramId),
+      columns: {
+        id: true
       }
     })
   }

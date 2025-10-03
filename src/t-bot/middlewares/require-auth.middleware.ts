@@ -1,17 +1,17 @@
 import type { Middleware } from "grammy";
 import type { MyContext } from "../types/grammy.type.js";
-import db, { workers } from "../../database/index.js";
+import db, { users } from "../../database/index.js";
 import { eq } from "drizzle-orm";
 
 export const requireAuthMiddleware: Middleware<MyContext> = async (ctx, next) => {
-    const worker = await db.
+    const user = await db.
     query
-    .workers
+    .users
     .findFirst({
-        where: eq(workers.telegramId, ctx.chatId || 0)
+        where: eq(users.telegramId, ctx.chatId || 0)
     })
 
-    if(!worker) {
+    if(!user) {
         await ctx.reply('Доступ запрещен! Если есть ключ вы можете зарегистрироватся нажав на команду /register')
         return;
     }

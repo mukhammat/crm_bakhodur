@@ -9,17 +9,14 @@ const apiApp = new Hono()
 .use(logger())
 .use(cors())
 
-// Routers
-import { authRouter } from './modules/auth/auth.router.js'
-import { taskRouter } from './modules/task/task.router.js'
-import { userRouter } from "./modules/user/user.router.js";
-import { workerRouter } from './modules/worker/worker.router.js'
 
+import { authRouter } from './routers/auth.router.js'
+import { taskRouter } from './routers/task.router.js'
+import { userRouter } from "./routers/user.router.js";
 apiApp
 .route('/auth', authRouter(db))
 .route("/tasks", taskRouter(db))
 .route("/users", userRouter(db))
-.route('/workers', workerRouter(db))
 
 // Global handlers
 import { errorHandler } from './middleware/error-handler.js'
