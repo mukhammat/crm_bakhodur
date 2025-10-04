@@ -2,7 +2,8 @@
   <v-app-bar app color="primary" dark elevation="2">
     <!-- Логотип или название -->
     <v-toolbar-title class="cursor-pointer" @click="goHome">
-      🚀 MyApp
+      <v-icon left>mdi-rocket</v-icon>
+      CRM Bakhodur
     </v-toolbar-title>
 
     <!-- Spacer чтобы кнопки ушли вправо -->
@@ -72,7 +73,7 @@ const route = useRoute()
 const menuItems = [
   { name: 'Главная', path: '/', icon: 'mdi-home' },
   { name: 'Задачи', path: '/tasks', icon: 'mdi-clipboard-check' },
-  { name: 'Работкики', path: '/users', icon: 'mdi-information' },
+  { name: 'Работники', path: '/users', icon: 'mdi-information' },
 ]
 
 // Навигация по путям

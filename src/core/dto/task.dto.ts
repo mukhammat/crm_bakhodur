@@ -8,3 +8,8 @@ export type ParamsType =
 Partial<Pick<InferResultType<'tasks'>, 'status' | 'createdBy' | 'priority' | 'dueDate' | 'createdAt'>> & {
     offset?: number
 }
+
+export type AssignmentLength = {
+    status: "pending" | "in_progress" | "completed";
+    count: number;
+}

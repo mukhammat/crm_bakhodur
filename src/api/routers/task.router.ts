@@ -23,4 +23,5 @@ export const taskRouter = (db: DrizzleClient) => {
     
     .use(requireRole(['admin']))
     .delete("/:id", taskController.delete)
+    .get('/assignment-length/:id', taskController.getAssignmentLengthByUserId)
 };

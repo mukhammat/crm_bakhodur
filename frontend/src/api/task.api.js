@@ -59,6 +59,12 @@ class TaskApi {
             headers: this.headers,
         })
     }
+
+    async getAssignmentLength (userId) {
+        return POSTGET.request(`${this.SERVER}/api/tasks/assignment-length/${userId}`, {
+            headers: this.headers,
+        })
+    }
 }
 
 export const taskApi = new TaskApi();

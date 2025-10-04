@@ -26,7 +26,6 @@
         <v-card>
           <v-card-title>Задачи по статусу</v-card-title>
           <v-card-text>
-            <!-- Здесь можно вставить Recharts/Chart.js -->
             <div class="text-center">[Диаграмма]</div>
           </v-card-text>
         </v-card>
@@ -39,15 +38,22 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <div v-if="error" class="text-red">Ошибка: {{ error }}</div>
   </v-container>
 </template>
 
 <script setup>
-const stats = {
-  inProgress: 15,
-  pending: 40,
-  points: 5800
-}
+import { taskApi } from '../api/task.api'
+import { ref, onMounted } from 'vue'
+
+const stats = ref({
+  inProgress: 0,
+  pending: 0,
+  points: 0
+})
+
+const error = ref(null)
 
 const userHeaders = [
   { title: 'Имя', key: 'name' },
@@ -60,4 +66,38 @@ const topUsers = [
   { name: 'Анна', tasksCompleted: 45, points: 1100 },
   { name: 'Олег', tasksCompleted: 30, points: 700 }
 ]
+
+async function fetchTasks(status) {
+  const response = await taskApi.getAll({ status })
+  if (!response.ok) {
+    const text = await response.text()
+    throw new Error(`Ошибка ${response.status}: ${text}`)
+  }
+  return response.json()
+}
+
+onMounted(async () => {
+  try {
+    // В процессе
+    const inProgressRes = await fetchTasks('in_progress')
+    stats.value.inProgress = inProgressRes.data.tasks.length
+
+    // Ожидают
+    const pendingRes = await fetchTasks('pending')
+    stats.value.pending = pendingRes.data.tasks.length
+
+    // Сумма баллов (считаем по in_progress + pending)
+    const allTasks = [
+      ...inProgressRes.data.tasks,
+      ...pendingRes.data.tasks
+    ]
+    stats.value.points = allTasks.reduce(
+      (sum, t) => sum + (t.points ?? 0),
+      0
+    )
+  } catch (err) {
+    error.value = err.message
+    console.error('Ошибка загрузки задач:', err)
+  }
+})
 </script>

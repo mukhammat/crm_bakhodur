@@ -32,7 +32,7 @@ const routes = [
       component: DashboardPage,
       meta: { 
         requiresAuth: true,
-        roles: ['admin', 'manager', 'worker'] // все авторизованные пользователи
+        roles: ['admin', 'manager',] // все авторизованные пользователи
       }
     },
     {

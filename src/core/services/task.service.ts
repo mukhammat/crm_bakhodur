@@ -1,7 +1,7 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { taskAssignments, tasks, type DrizzleClient } from "../../database/index.js";
 import { CustomError } from "../errors/custom.error.js";
-import type { CreateDto, ParamsType, UpdateDto } from "../dto/task.dto.js";
+import type { CreateDto, ParamsType, UpdateDto, AssignmentLength } from "../dto/task.dto.js";
 
 export interface ITaskService {
   create(data: CreateDto): Promise<string>;
@@ -12,6 +12,7 @@ export interface ITaskService {
   assignTaskToUser(taskId: string, userId: string): Promise<string>
   unassignTaskFromUser(taskAssignmentId: string): Promise<string>
   getAssignmentByUserId(id: string): Promise<typeof taskAssignments.$inferSelect[] | undefined>
+  getAssignmentLengthByUserId(userId: string): Promise<AssignmentLength[]>
 }
 
 export class TaskService implements ITaskService {
@@ -143,5 +144,19 @@ export class TaskService implements ITaskService {
         task: true
       }
     })
+  }
+
+  public async getAssignmentLengthByUserId(userId: string) {
+    const rows = await this.db
+      .select({
+        status: tasks.status,
+        count: sql<number>`count(*)`,
+      })
+      .from(tasks)
+      .innerJoin(taskAssignments, eq(taskAssignments.taskId, tasks.id))
+      .where(eq(taskAssignments.userId, userId))
+      .groupBy(tasks.status);
+
+    return rows
   }
 }

@@ -58,4 +58,12 @@ export class TaskController {
 
     return c.json({ data: { deletedTaskAssignmentId }});
   }
+
+  getAssignmentLengthByUserId = async (c: Context) => {
+    const { id } = c.req.param();
+
+    const rows = await this.taskService.getAssignmentLengthByUserId(id);
+
+    return c.json({ rows });
+  }
 }
