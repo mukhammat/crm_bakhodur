@@ -29,7 +29,17 @@ apiApp
 const app = new Hono()
 .route('/api', apiApp)
 .use('/*', serveStatic({
-  root: './static'
+  root: './static',
+  rewriteRequestPath: (path) => {
+    if (path.startsWith('/api/')) {
+      return path
+    }
+    if (path.match(/\.[a-zA-Z0-9]+$/)) {
+      return path
+    }
+
+    return '/index.html'
+  }
 }))
 
 serve({
