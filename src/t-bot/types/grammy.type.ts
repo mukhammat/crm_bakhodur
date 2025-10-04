@@ -3,7 +3,11 @@ import {
   type ConversationFlavor} from "@grammyjs/conversations";
 import type { Bot, Context } from "grammy";
 
-export type MyContext = ConversationFlavor<Context>
+export type MyContext = ConversationFlavor<Context> & {
+  user?: {
+    id: string
+  }
+}
 
 export type MyBot = Bot<MyContext>
 

@@ -8,13 +8,18 @@ export const requireAuthMiddleware: Middleware<MyContext> = async (ctx, next) =>
     query
     .users
     .findFirst({
-        where: eq(users.telegramId, ctx.chatId || 0)
+        where: eq(users.telegramId, ctx.chatId || 0),
+        columns: {
+            id: true
+        }
     })
 
     if(!user) {
         await ctx.reply('Доступ запрещен! Если есть ключ вы можете зарегистрироватся нажав на команду /register')
         return;
     }
+
+    ctx.user = user
 
     await next()
 }

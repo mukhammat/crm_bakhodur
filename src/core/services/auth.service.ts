@@ -54,7 +54,8 @@ export class AuthService implements IAuthService {
         email,
         password,
         name,
-        key
+        key,
+        telegramId,
     }: RegisterDto) {
         const role = await redis.get(`register_key:${key}`);
 
@@ -73,7 +74,8 @@ export class AuthService implements IAuthService {
                 email,
                 hash: hash,
                 role: role,
-                name
+                name,
+                telegramId
             })
             .returning({
                 id: users.id

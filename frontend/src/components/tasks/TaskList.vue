@@ -9,6 +9,8 @@
             item-key="id"
             class="elevation-1"
             :loading="loading"
+            @click:row="handleRowClick"
+            hover
           >
             <!-- eslint-disable-next-line vue/valid-v-slot -->
             <template #item.title="{ item }">
@@ -24,7 +26,7 @@
 
             <!-- eslint-disable-next-line vue/valid-v-slot -->
             <template #item.assignments.worker="{ item }">
-              <v-menu v-if="item.assignments && item.assignments.length > 0">
+              <v-menu v-if="item.assignments && item.assignments.length > 0" @click.stop>
                 <template #activator="{ props }">
                   <v-btn v-bind="props" color="green" size="small" variant="tonal">
                     {{ item.assignments[0]?.user?.name || 'Без имени' }}
@@ -95,17 +97,7 @@
 
             <!-- eslint-disable-next-line vue/valid-v-slot -->
             <template #item.actions="{ item }">
-              <div class="d-flex ga-2">
-                <v-btn 
-                  v-if="canEditTask(item)"
-                  color="primary" 
-                  size="small" 
-                  variant="outlined"
-                  @click="openEditDialog(item)"
-                  :disabled="loading"
-                >
-                  Обновить
-                </v-btn>
+              <div class="d-flex ga-2" @click.stop>
                 <v-btn
                   v-if="canDeleteTask(item)"
                   color="error"
@@ -418,6 +410,10 @@ const headers = [
 ]
 
 // Dialog functions
+function handleRowClick(event, { item }) {
+  openEditDialog(item)
+}
+
 function openEditDialog(task) {
   editingTask.value = {
     ...task,

@@ -3,8 +3,8 @@ import db, { users } from "../../database/index.js";
 import type { Context } from "grammy";
 import { redis } from '../../cache/redis.js'
 
-export class AuthController {
-    public registerConversation = async (conversation: Conversation, ctx: Context) => {
+export class AuthConversation {
+    public register = async (conversation: Conversation, ctx: Context) => {
         await ctx.reply("Введите ключ регистрации:");
     
         const { message } = await conversation.wait();
@@ -24,7 +24,7 @@ export class AuthController {
     
         const name = ctx.from?.first_name || ctx.from?.username || "Неизвестный пользователь";
     
-        const [user] = await db.insert(users).values({
+        await db.insert(users).values({
             email: ctx.chat?.id.toString() || "",
             hash: "0",
             name,

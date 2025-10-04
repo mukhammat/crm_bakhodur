@@ -6,7 +6,8 @@ export type RegisterDto = {
     email: string,
     password: string,
     name: string,
-    key: string
+    key: string,
+    telegramId?: number
 }
 
 export type UserRoleType = UserType['role'];

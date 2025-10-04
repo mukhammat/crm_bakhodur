@@ -11,7 +11,7 @@ export interface ITaskService {
   delete(id: string): Promise<string>;
   assignTaskToUser(taskId: string, userId: string): Promise<string>
   unassignTaskFromUser(taskAssignmentId: string): Promise<string>
-  getAssignmentById(id: string): Promise<typeof taskAssignments.$inferSelect[] | undefined>
+  getAssignmentByUserId(id: string): Promise<typeof taskAssignments.$inferSelect[] | undefined>
 }
 
 export class TaskService implements ITaskService {
@@ -136,7 +136,7 @@ export class TaskService implements ITaskService {
     return asign.id
   }
 
-  public async getAssignmentById(id: string) {
+  public async getAssignmentByUserId(id: string) {
     return this.db.query.taskAssignments.findMany({
       where: eq(taskAssignments.userId, id),
       with: {
