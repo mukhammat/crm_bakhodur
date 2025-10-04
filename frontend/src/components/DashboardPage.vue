@@ -3,12 +3,6 @@
     <v-row>
       <v-col cols="12" md="3">
         <v-card>
-          <v-card-title>Выполнено задач</v-card-title>
-          <v-card-text class="text-h4">{{ stats.completed }}</v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" md="3">
-        <v-card>
           <v-card-title>В процессе</v-card-title>
           <v-card-text class="text-h4">{{ stats.inProgress }}</v-card-text>
         </v-card>
@@ -50,7 +44,6 @@
 
 <script setup>
 const stats = {
-  completed: 120,
   inProgress: 15,
   pending: 40,
   points: 5800

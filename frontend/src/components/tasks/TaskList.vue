@@ -44,11 +44,6 @@
                     v-for="assignment in item.assignments"
                     :key="assignment.id"
                   >
-                    <template #prepend>
-                      <v-avatar size="24" :color="getRoleColor(assignment.user?.role)">
-                        <v-icon size="16">mdi-account</v-icon>
-                      </v-avatar>
-                    </template>
                     <v-list-item-title class="text-body-2">
                       {{ assignment.user?.name || 'Без имени' }}
                     </v-list-item-title>
@@ -80,9 +75,6 @@
             <!-- eslint-disable-next-line vue/valid-v-slot -->
             <template #item.createdBy.name="{ item }">
               <div class="d-flex align-center">
-                <v-avatar size="24" :color="getRoleColor(item.createdBy?.role)" class="mr-2">
-                  <v-icon size="16">mdi-account</v-icon>
-                </v-avatar>
                 <span>{{ item.createdBy?.name || 'Неизвестно' }}</span>
                 <v-chip 
                   v-if="item.createdBy?.id === auth.user?.id" 
@@ -94,61 +86,10 @@
                 </v-chip>
               </div>
             </template>
-
-            <!-- eslint-disable-next-line vue/valid-v-slot -->
-            <template #item.actions="{ item }">
-              <div class="d-flex ga-2" @click.stop>
-                <v-btn
-                  v-if="canDeleteTask(item)"
-                  color="error"
-                  size="small"
-                  variant="outlined"
-                  @click="confirmDelete(item)"
-                  :loading="deletingTasks.includes(item.id)"
-                  :disabled="loading"
-                >
-                  Удалить
-                </v-btn>
-                <v-chip 
-                  v-if="!canEditTask(item) && !canDeleteTask(item)"
-                  color="grey"
-                  variant="outlined"
-                  size="small"
-                >
-                  Только просмотр
-                </v-chip>
-              </div>
-            </template>
           </v-data-table>
         </v-card>
       </v-col>
     </v-row>
-
-    <!-- Диалог подтверждения удаления -->
-    <v-dialog v-model="showDeleteDialog" max-width="400px">
-      <v-card>
-        <v-card-title class="text-h6">
-          Подтвердите удаление
-        </v-card-title>
-        <v-card-text>
-          Вы уверены, что хотите удалить задачу "{{ taskToDelete?.title }}"?
-          Это действие нельзя отменить.
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn variant="text" @click="showDeleteDialog = false">
-            Отмена
-          </v-btn>
-          <v-btn 
-            color="error" 
-            @click="deleteTask"
-            :loading="deletingTasks.includes(taskToDelete?.id)"
-          >
-            Удалить
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
 
     <!-- Диалог редактирования задачи -->
     <v-dialog v-model="showEditDialog" max-width="700px">
@@ -174,6 +115,7 @@
                   required 
                   :rules="[v => !!v || 'Название обязательно']"
                   variant="outlined"
+                  :disabled="!canEditTask(editingTask)"
                 />
               </v-col>
               
@@ -185,6 +127,7 @@
                   :rules="[v => !!v || 'Описание обязательно']"
                   rows="3"
                   variant="outlined"
+                  :disabled="!canEditTask(editingTask)"
                 />
               </v-col>
 
@@ -196,6 +139,7 @@
                   item-value="value"
                   label="Статус задачи"
                   variant="outlined"
+                  :disabled="!canEditTask(editingTask)"
                 />
               </v-col>
 
@@ -220,6 +164,7 @@
                   closable-chips
                   :loading="loadingUsers"
                   variant="outlined"
+                  :disabled="!canEditTask(editingTask)"
                 >
                   <template #selection="{ item, index }">
                     <v-chip
@@ -280,22 +225,68 @@
                   Задача не назначена ни одному пользователю
                 </v-alert>
               </v-col>
+
+              <v-col cols="12" v-if="!canEditTask(editingTask)">
+                <v-alert 
+                  type="info" 
+                  variant="tonal"
+                  density="compact"
+                >
+                  У вас нет прав на редактирование этой задачи
+                </v-alert>
+              </v-col>
             </v-row>
           </v-container>
         </v-card-text>
         
         <v-card-actions>
+          <v-btn
+            v-if="canDeleteTask(editingTask)"
+            color="error"
+            variant="text"
+            @click="confirmDelete(editingTask)"
+            :loading="deletingTasks.includes(editingTask.id)"
+          >
+            Удалить
+          </v-btn>
           <v-spacer></v-spacer>
           <v-btn variant="text" @click="closeEditDialog">
-            Отмена
+            Закрыть
           </v-btn>
           <v-btn 
+            v-if="canEditTask(editingTask)"
             color="success" 
             @click="saveEditTask" 
             :loading="isAddingTask"
             :disabled="!editingTask.title || !editingTask.description"
           >
             Сохранить изменения
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- Диалог подтверждения удаления -->
+    <v-dialog v-model="showDeleteDialog" max-width="400px">
+      <v-card>
+        <v-card-title class="text-h6">
+          Подтвердите удаление
+        </v-card-title>
+        <v-card-text>
+          Вы уверены, что хотите удалить задачу "{{ taskToDelete?.title }}"?
+          Это действие нельзя отменить.
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn variant="text" @click="showDeleteDialog = false">
+            Отмена
+          </v-btn>
+          <v-btn 
+            color="error" 
+            @click="deleteTask"
+            :loading="deletingTasks.includes(taskToDelete?.id)"
+          >
+            Удалить
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -406,7 +397,6 @@ const headers = [
   { title: 'Статус', key: 'status' },
   { title: 'Создатель', key: 'createdBy.name' },
   { title: 'Исполнители', key: 'assignments.worker' },
-  { title: 'Действия', key: 'actions', sortable: false },
 ]
 
 // Dialog functions
@@ -430,6 +420,7 @@ function closeEditDialog() {
 function confirmDelete(task) {
   taskToDelete.value = task
   showDeleteDialog.value = true
+  showEditDialog.value = false
 }
 
 function removeUser(userId) {
