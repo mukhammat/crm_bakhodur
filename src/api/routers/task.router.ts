@@ -4,6 +4,8 @@ import { TaskService } from "../../core/services/task.service.js";
 import { TaskController } from "../controllers/task.controller.js";
 import { requireAuth } from '../middleware/require-auth.js';
 import { requireRole } from "../middleware/require-role.js";
+import { zValidator } from "@hono/zod-validator";
+import { CreateSchema, UpdateSchema, AssignTaskToUserSchema } from '../../core/schemas/task.schema.js'
 
 export const taskRouter = (db: DrizzleClient) => {
   const taskController = new TaskController(new TaskService(db));
@@ -14,10 +16,14 @@ export const taskRouter = (db: DrizzleClient) => {
       'admin',
       'manager'
     ]))
-    .post("/", taskController.create)
+    .post("/", zValidator('json', CreateSchema), taskController.create)
     .get("/", taskController.getAll)
     .get("/:id", taskController.getById)
-    .post('/assign-task-worker', taskController.assignTaskToUser)
+    .post(
+      '/assign-task-worker',
+      zValidator('json', AssignTaskToUserSchema),
+      taskController.assignTaskToUser
+    )
     .delete('/unassign-task-from-worker/:id', taskController.unassignTaskFromUser)
     .put("/:id", taskController.update)
     

@@ -1,17 +1,17 @@
 import { and, eq, sql } from "drizzle-orm";
 import { taskAssignments, tasks, type DrizzleClient } from "../../database/index.js";
 import { CustomError } from "../errors/custom.error.js";
-import type { CreateDto, ParamsType, UpdateDto, AssignmentLength } from "../dto/task.dto.js";
+import type { CreateDto, ParamsType, UpdateDto, AssignmentLength, Assignment, TaskType } from "../dto/task.dto.js";
 
 export interface ITaskService {
   create(data: CreateDto): Promise<string>;
-  getById(id: string): Promise<typeof tasks.$inferSelect | null>;
-  getAll(params?: ParamsType): Promise<typeof tasks.$inferSelect[]>;
+  getById(id: string): Promise<TaskType | null>;
+  getAll(params?: ParamsType): Promise<TaskType[]>;
   update( id: string, data: UpdateDto ): Promise<string>;
   delete(id: string): Promise<string>;
   assignTaskToUser(taskId: string, userId: string): Promise<string>
   unassignTaskFromUser(taskAssignmentId: string): Promise<string>
-  getAssignmentByUserId(id: string): Promise<typeof taskAssignments.$inferSelect[] | undefined>
+  getAssignmentByUserId(id: string): Promise<Assignment[]>
   getAssignmentLengthByUserId(userId: string): Promise<AssignmentLength[]>
 }
 

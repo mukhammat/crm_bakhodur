@@ -40,7 +40,7 @@ export function notificationEvents(
         const inline = new InlineKeyboard()
         .text('Приступить', `take:${task.id}`)
 
-        await bot.api.sendMessage(user.telegramId, `Новая задача: ${task?.title}\n${task?.description}`, {
+        await bot.api.sendMessage(user.telegramId, `✅ У вас новая задача: ${task?.title}\n${task?.description}`, {
           reply_markup: inline
         });
     

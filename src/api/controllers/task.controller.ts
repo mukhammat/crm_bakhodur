@@ -7,10 +7,10 @@ export class TaskController {
   constructor(private taskService: ITaskService) {}
 
   create = async (c: ContextJWT) => {
-    const { title, description } = await c.req.json();
+    const { title, description,  } = await c.req.json();
     const { id } = c.get('jwtPayload');
     const taskId = await this.taskService
-    .create({ title, description, createdBy: id });
+    .create({ title, description, createdBy: id, priority: 1 });
     
     return c.json({ data: { id: taskId } }, 201);
   };

@@ -17,11 +17,27 @@ export class TaskCallback {
             console.log('Extracted taskId:', taskId);
     
             if (!ctx.user?.id) return;
+
+            let  close = false;
+            const assignment = await this.taskService.getAssignmentByUserId(ctx.user.id);
+            if(assignment) {
+                for (const element of assignment) {
+                    if(element.task.status === 'in_progress') {
+                        await ctx.reply('Вы не можете выполнять несколько зачаь одновременно!')
+                        close = true
+                    }
+                }
+            }
+
+            if(close) {
+                return;
+            }
             
             await this.taskService.update(taskId, {
                 status: 'in_progress',
             });
 
+            await ctx.reply('Вы взяли задачу на выполнения!')
         } catch(error) {
             console.log(error)
         }
