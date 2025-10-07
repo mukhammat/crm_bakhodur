@@ -133,6 +133,18 @@
 
               <v-col cols="12" md="6">
                 <v-select
+                  v-model="editingTask.priority"
+                  :items="priorityOptions"
+                  item-title="label"
+                  item-value="value"
+                  label="Приоритет"
+                  variant="outlined"
+                  :disabled="!canEditTask(editingTask)"
+                />
+              </v-col>
+
+              <v-col cols="12" md="6">
+                <v-select
                   v-model="editingTask.status"
                   :items="statusOptions"
                   item-title="label"
@@ -336,6 +348,14 @@ const statusOptions = [
   { label: 'Завершено', value: 'completed' }
 ]
 
+const priorityOptions = [
+  { label: '1', value: 1 },
+  { label: '2', value: 2 },
+  { label: '3', value: 3 },
+  { label: '4', value: 4 },
+  { label: '5', value: 5 },
+]
+
 // Props
 const props = defineProps({
   tasks: Array,
@@ -393,7 +413,8 @@ onMounted(getUsers)
 // Table headers
 const headers = [
   { title: 'Название', key: 'title' },
-  { title: 'Описание', key: 'description' },
+  // { title: 'Описание', key: 'description' },
+  { title: 'Приоритет', key: 'priority' },
   { title: 'Статус', key: 'status' },
   { title: 'Создатель', key: 'createdBy.name' },
   { title: 'Исполнители', key: 'assignments.worker' },
@@ -450,7 +471,8 @@ async function saveEditTask() {
     const taskResponse = await taskApi.edit(editingTask.value.id, {
       title: editingTask.value.title,
       description: editingTask.value.description,
-      status: editingTask.value.status
+      status: editingTask.value.status,
+      priority: editingTask.value.priority
     })
 
     if (!taskResponse.ok) {

@@ -14,6 +14,7 @@
         <v-card-text>
           <v-text-field v-model="newTask.title" label="Название" required />
           <v-text-field v-model="newTask.description" label="Описание" required />
+          <v-text-field v-model="newTask.priority" label="Приоритет" required />
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -35,8 +36,10 @@ import { taskApi } from '../../api/task.api.js'
 
 const newTask = ref({
   title: '',
-  description: ''
+  description: '',
+  priority: 0
 })
+
 const props = defineProps({
   getTasks: Function
 })
@@ -51,7 +54,11 @@ async function addTask() {
 
   try {
     isAddingTask.value = true
-    const response = await taskApi.add(newTask.value);
+    const response = await taskApi.add({
+      priority: Number(newTask.value.priority),
+      title: newTask.value.title,
+      description: newTask.value.description
+    });
     if (response.ok) {
       closeAddDialog()
       await getTasks();
@@ -63,7 +70,7 @@ async function addTask() {
 
 function closeAddDialog() {
   showAddDialog.value = false
-  newTask.value = { title: '', description: '' }
+  newTask.value = { title: '', description: '', priority: 0 }
 }
 
 </script>
