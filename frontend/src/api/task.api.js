@@ -2,7 +2,7 @@ import { POSTGET } from "./helper/postget";
 import { useAuthStore } from "../stores/auth";
 
 class TaskApi {
-    SERVER = 'http://localhost:3000';
+    SERVER = '';
 
     constructor() {
     }

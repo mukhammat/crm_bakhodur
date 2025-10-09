@@ -2,7 +2,7 @@ import { POSTGET } from "./helper/postget";
 import { useAuthStore } from "../stores/auth";
 
 class UserApi{
-    SERVER = 'http://localhost:3000';
+    SERVER = '';
     constructor() {}
 
         // динамический getter заголовков
