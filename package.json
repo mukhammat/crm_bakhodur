@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "pm2 start dist/index.js --name project_rk",
+    "start": "pm2 start dist/index.js --name crm_bakhodur",
     "generate": "npx drizzle-kit generate",
     "migrate": "npx drizzle-kit migrate"
   },
