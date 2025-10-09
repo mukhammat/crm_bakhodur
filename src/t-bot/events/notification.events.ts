@@ -1,5 +1,5 @@
 import { InlineKeyboard, type Bot } from "grammy";
-import { eventBus } from "../../event-bus.js";
+import { eventBus } from "../../events/event-bus.js";
 import { TaskService } from "../../core/services/task.service.js";
 import { UserService } from "../../core/services/user.service.js";
 import db from "../../database/index.js";
