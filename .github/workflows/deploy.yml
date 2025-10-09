@@ -1,0 +1,38 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+      - main  # ветка для деплоя
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Sync files to server
+        run: |
+          rsync -avz --exclude node_modules --exclude .git ./ username@your_server_ip:/home/username/crm_bakhodur/
+
+      - name: Install dependencies and build
+        run: |
+          ssh username@your_server_ip "
+            cd /home/username/crm_bakhodur &&
+            npm install &&
+            npm run build
+          "
+
+      - name: Restart backend with pm2
+        run: |
+          ssh username@your_server_ip "
+            cd /home/username/crm_bakhodur &&
+            pm2 restart backend || pm2 start dist/index.js --name backend
+          "

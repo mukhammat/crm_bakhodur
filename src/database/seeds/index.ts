@@ -8,7 +8,7 @@ async function main() {
         columns: {
             email: f.default({ defaultValue: 'dosnet2200@gmail.com' }),
             name: f.default({ defaultValue: 'Bakhodur' }),
-            password: f.default({ defaultValue: '$2b$10$bBeHCa5ybqbUzHSY7ktrmOaeH1Tj.FbbNNgJsxO57wtoZ7NhpoRDS' }),
+            hash: f.default({ defaultValue: '$2b$10$vf75cfhn7GH0afZboAcPK.uKj4HhLdR/bsii7f76vhUEwLv7UZa.C' }),
             role: f.default({ defaultValue: 'admin' }),
         },
         count: 1
