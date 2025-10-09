@@ -8,7 +8,7 @@ import type { RegisterDto } from "../dto/auth.dto.js";
 import { CustomError } from "../errors/custom.error.js";
 
 export interface IAuthService {
-    login(email: string, password: string): Promise<string>;
+    login(email: string, password: string): Promise<{token: string, expiresIn: string}>;
     register(dto: RegisterDto): Promise<string>;
 }
 
@@ -47,7 +47,7 @@ export class AuthService implements IAuthService {
             role: user.role
         }, "24h");
 
-        return token;
+        return { token, expiresIn: '24h'};
     }
 
     public async register({
