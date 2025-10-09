@@ -11,9 +11,6 @@
 # deps
 node_modules/
 
-#
-/src/database/migrations/*
-
 # env
 .env
 .env.production
@@ -29,3 +26,8 @@ lerna-debug.log*
 
 # misc
 .DS_Store
+
+# Custom
+dist/
+static/
+/src/database/migrations/*
