@@ -1,0 +1,36 @@
+
+services:
+  db:
+    image: postgres:16
+    container_name: crm_db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: nohamylove
+      POSTGRES_DB: crm_bakhodur
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  backend:
+    build: .
+    container_name: crm_backend
+    restart: always
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:nohamylove@db:5432/crm_bakhodur?schema=public
+      SECRET_KEY: your_secret_key_here
+      TELEGRAM_BOT_TOKEN: 8195682711:AAH8hMDfYHMRHMQaRWKqRoPQeD9XH9Z-9x4
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
+    command: >
+      sh -c "
+        npx drizzle-kit generate &&
+        npx drizzle-kit migrate &&
+        node src/index.js
+      "
+    volumes:
+      - .:/app
