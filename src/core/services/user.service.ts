@@ -1,5 +1,5 @@
 import { randomBytes } from "crypto";
-import { redis } from "../../cache/index.js";
+import { redis } from "../../cache/redis.js";
 import { CustomError } from "../errors/custom.error.js";
 import { users, type DrizzleClient } from "../../database/index.js";
 import type { GetUserDto, ParamsType, RoleDto, UpdateDto } from "../dto/user.dto.js";

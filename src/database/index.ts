@@ -22,5 +22,6 @@ export type DrizzleClient = typeof db;
 export type TransactionType = Parameters<Parameters<DrizzleClient['transaction']>[0]>[0];
 
 export * from './schema/index.js';
+export * as schema from './schema/index.js';
 export * from './helper.js';
 export default db;

@@ -3,7 +3,7 @@ import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { and, eq } from "drizzle-orm";
 import { type StringValue } from 'ms';
 import { users, type DrizzleClient } from "../../database/index.js";
-import { redis } from '../../cache/index.js'
+import { redis } from '../../cache/redis.js'
 import type { RegisterDto } from "../dto/auth.dto.js";
 import { CustomError } from "../errors/custom.error.js";
 
