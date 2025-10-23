@@ -2,9 +2,12 @@
   "name": "crm_bakhodur",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "pm2 start dist/index.js --name crm_bakhodur",
+    "dev:server": "tsx watch src/index.ts",
+    "dev:front": "cd ./frontend && npm run serve",
+    "build:server": "tsc",
+    "build:front": "cd ./frontend && npm run build",
+    "start:server": "pm2 start dist/index.js --name crm_bakhodur_server",
+    "start:front": "cd ./frontend && pm2 start dist/index.js --name crm_bakhodur_front",
     "generate": "npx drizzle-kit generate",
     "migrate": "npx drizzle-kit migrate",
     "genmig": "npm run generate && npm run migrate"

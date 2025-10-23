@@ -30,4 +30,4 @@ lerna-debug.log*
 # Custom
 dist/
 static/
-migrations
+/src/database/migrations
