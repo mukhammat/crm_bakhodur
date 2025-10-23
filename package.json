@@ -6,7 +6,8 @@
     "build": "tsc",
     "start": "pm2 start dist/index.js --name crm_bakhodur",
     "generate": "npx drizzle-kit generate",
-    "migrate": "npx drizzle-kit migrate"
+    "migrate": "npx drizzle-kit migrate",
+    "genmig": "npm run generate && npm run migrate"
   },
   "dependencies": {
     "@grammyjs/conversations": "^2.1.0",
