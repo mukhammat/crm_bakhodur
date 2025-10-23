@@ -1,11 +1,13 @@
 import { POSTGET } from "./helper/postget";
 import { useAuthStore } from "../stores/auth";
+import env from '../../env.js'
 
 class UserApi{
-    SERVER = '';
+    SERVER = env.SERVER;
+
     constructor() {}
 
-        // динамический getter заголовков
+    // динамический getter заголовков
     get headers() {
         this.auth = useAuthStore()
         return {

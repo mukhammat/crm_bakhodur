@@ -1,8 +1,9 @@
 import { POSTGET } from "./helper/postget";
 import { useAuthStore } from "../stores/auth";
+import env from '../../env.js'
 
 class TaskApi {
-    SERVER = '';
+    SERVER = env.SERVER;
 
     constructor() {
     }
