@@ -2,7 +2,7 @@ import bcrypt from "bcrypt"
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 import { and, eq } from "drizzle-orm";
 import { type StringValue } from 'ms';
-import { users, type DrizzleClient } from "../../database/index.js";
+import { users, userRoles, type DrizzleClient } from "../../database/index.js";
 import { redis } from '../../cache/redis.js'
 import type { RegisterDto } from "../dto/auth.dto.js";
 import { CustomError } from "../errors/custom.error.js";
@@ -24,6 +24,9 @@ export class AuthService implements IAuthService {
         .users
         .findFirst({
             where: and(eq(users.email, email)),
+            with: {
+                role: true
+            }
         });
 
         if (!user) {
@@ -44,7 +47,7 @@ export class AuthService implements IAuthService {
         const token = this.generateJwt({
             id: user.id,
             email,
-            role: user.role
+            role: user.role.title
         }, "24h");
 
         return { token, expiresIn: '24h'};
@@ -57,12 +60,20 @@ export class AuthService implements IAuthService {
         key,
         telegramId,
     }: RegisterDto) {
-        const role = await redis.get(`register_key:${key}`);
+        const roleTitle = await redis.get(`register_key:${key}`);
 
-        if (
-            role !== 'manager'
-        ) {
-            throw new CustomError('Ключь регистраций не найден!');
+        if (!roleTitle) {
+            throw new CustomError('Ключ регистрации не найден!');
+        }
+
+        // Получаем roleId из таблицы userRoles
+        const [role] = await this.db
+            .select()
+            .from(userRoles)
+            .where(eq(userRoles.title, roleTitle));
+
+        if (!role) {
+            throw new CustomError('Указанная роль не найдена в системе!');
         }
 
         const hash = await this.hashPassword(password);
@@ -73,7 +84,7 @@ export class AuthService implements IAuthService {
             .values({
                 email,
                 hash: hash,
-                role: role,
+                roleId: role.id,
                 name,
                 telegramId
             })

@@ -7,6 +7,7 @@ import { db } from '../database/index.js'
 const app = new Hono()
 .use(logger())
 .use(cors())
+.basePath('/api')
 
 import { authRouter } from './routers/auth.router.js'
 import { taskRouter } from './routers/task.router.js'

@@ -10,13 +10,10 @@ export const taskStatuses = table("task_statuses", {
 export const userRoles = table("user_roles", {
   id: t.serial().primaryKey(),
   title: t.varchar().unique().notNull()
-})
-
-export const userRoleEnum = t.pgEnum('user_role', ['admin', 'manager', 'worker']);
+});
 
 export const users = table("users", {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
-  role: userRoleEnum("role").default("manager").notNull(),
   roleId: t.serial('role_id')
   //.notNull()
   .references(() => userRoles.id),
@@ -26,6 +23,17 @@ export const users = table("users", {
   isActive: t.boolean('is_active').notNull().default(true),
   telegramId: t.integer('telegram_id').unique(),
 });
+
+export const userRolesRelations = relations(userRoles, ({ many }) => ({
+  users: many(users),
+}));
+
+export const usersRelations = relations(users, ({ one }) => ({
+  role: one(userRoles, {
+    fields: [users.roleId],
+    references: [userRoles.id],
+  }),
+}));
 
 export const taskStatusEnum = t.pgEnum('task_status', ['pending', 'in_progress', 'completed']);
 
