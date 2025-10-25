@@ -1,12 +1,8 @@
-import { randomBytes } from "crypto";
-import { redis } from "../../cache/redis.js";
-import { CustomError } from "../errors/custom.error.js";
 import { users, type DrizzleClient } from "../../database/index.js";
 import type { GetUserDto, ParamsType, RoleDto, UpdateDto } from "../dto/user.dto.js";
 import { and, eq } from "drizzle-orm";
 
 export interface IUserService {
-  generateRegisterKey(role: RoleDto): Promise<string>;
   getAll(params?: ParamsType): Promise<GetUserDto[]>
   update(userId: string, data: UpdateDto): Promise<string>
   delete(userId: string): Promise<string>
@@ -16,20 +12,6 @@ export interface IUserService {
 
 export class UserService implements IUserService {
   constructor(private db: DrizzleClient) {}
-
-  public async generateRegisterKey(role: RoleDto) {
-    if (!["manager", "worker", "admin"].includes(role)) {
-      throw new CustomError("Недопустимая роль для регистрации!");
-    }
-
-    // генерим случайный ключ (50 символов в hex = 25 байт)
-    const key = randomBytes(25).toString("hex");
-
-    // кладем в Redis с TTL 1 час
-    await redis.set(`register_key:${key}`, role, 'EX', 3600);
-
-    return key;
-  }
 
   public async getAll(params?: ParamsType) {
     const eqs = [];

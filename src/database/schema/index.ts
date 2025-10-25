@@ -2,11 +2,24 @@ import { relations } from 'drizzle-orm';
 import { pgTable as table } from 'drizzle-orm/pg-core';
 import * as t from 'drizzle-orm/pg-core';
 
+export const taskStatuses = table("task_statuses", {
+  id: t.serial().primaryKey(),
+  title: t.varchar().unique().notNull()
+})
+
+export const userRoles = table("user_roles", {
+  id: t.serial().primaryKey(),
+  title: t.varchar().unique().notNull()
+})
+
 export const userRoleEnum = t.pgEnum('user_role', ['admin', 'manager', 'worker']);
 
 export const users = table("users", {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
   role: userRoleEnum("role").default("manager").notNull(),
+  roleId: t.serial('role_id')
+  //.notNull()
+  .references(() => userRoles.id),
   email: t.varchar('email', { length: 100 }).notNull().unique(),
   hash: t.varchar('hash').notNull(),
   name: t.varchar('name', { length: 100 }).notNull(),
@@ -21,6 +34,9 @@ export const tasks = table("tasks", {
   title: t.varchar().notNull(),
   description: t.text('description').notNull(),
   status: taskStatusEnum('status').notNull().default('pending'),
+  statusId: t.serial('status_id')
+  //.notNull()
+  .references(() => taskStatuses.id),
   createdAt: t.timestamp('created_at').notNull().defaultNow(),
   dueDate: t.timestamp('due_date'), // Срок выполнения задачи
   priority: t.integer('priority').notNull().default(1), // Приоритет задачи
