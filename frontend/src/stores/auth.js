@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
+import env from '../../env.js'
 
-const SERVER = '';
+const SERVER = env.SERVER;
 
 export const useAuthStore = defineStore('auth', {
   state: () => {
@@ -14,7 +15,7 @@ export const useAuthStore = defineStore('auth', {
   },
 
   getters: {
-    role: (state) => state.user?.role || null,
+    role: (state) => state.user?.role?.title || null,
     isAuthenticated: (state) => !!state.token
   },
 

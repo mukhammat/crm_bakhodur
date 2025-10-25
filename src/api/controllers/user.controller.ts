@@ -6,17 +6,6 @@ import type { RoleDto, UpdateDto } from "../../core/dto/user.dto.js";
 export class UserController {
   constructor(private userService: IUserService) {}
 
-  generateRegisterKey = async (c: Context) => {
-    const role = c.req.param("role");
-
-    if (!role || (role !== "manager" && role !== "worker")) {
-      return c.json({ error: "Укажите ?role=manager или ?role=worker" }, 400);
-    }
-
-    const key = await this.userService.generateRegisterKey(role);
-    return c.json({ data: { key } });
-  };
-
   getAll = async (c: ContextJWT) => {
     const { role } = c.get('jwtPayload');
 

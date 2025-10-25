@@ -14,7 +14,7 @@ const routes = [
       component: TaskManager,
       meta: { 
         requiresAuth: true,
-        roles: ['admin', 'manager', 'worker']
+        roles: ['ADMIN', 'MANAGER', 'WORKER']
       }
     },
     {
@@ -23,7 +23,7 @@ const routes = [
       component: UserManager,
       meta: { 
         requiresAuth: true,
-        roles: ['admin', 'manager']
+        roles: ['ADMIN', 'MANAGER']
       }
     },
     {
@@ -32,7 +32,7 @@ const routes = [
       component: DashboardPage,
       meta: { 
         requiresAuth: true,
-        roles: ['admin', 'manager']
+        roles: ['ADMIN', 'MANAGER']
       }
     },
     {

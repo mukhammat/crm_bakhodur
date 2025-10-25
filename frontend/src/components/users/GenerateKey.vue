@@ -133,7 +133,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { userApi } from '../../api/user.api.js'
+import { userRoleApi } from '../../api/user-role.api'
 
 // Реактивные данные
 const selectedRole = ref('')
@@ -144,8 +144,8 @@ const errorMessage = ref('')
 
 // Роли
 const roles = [
-  { title: 'Менеджер', value: 'manager' },
-  { title: 'Работник', value: 'worker' }
+  { title: 'Менеджер', value: 'MANAGER' },
+  { title: 'Работник', value: 'WORKER' }
 ]
 
 // Функция генерации ключа
@@ -153,7 +153,7 @@ const generateKey = async () => {
   try {
     if (!selectedRole.value) return
   
-    const response = await userApi.generateKey(selectedRole.value);
+      const response = await userRoleApi.generateKey(selectedRole.value)
 
     const data = await response.json();
 
@@ -205,8 +205,8 @@ const shareKey = async () => {
 // Получить цвет для роли
 const getRoleColor = (role) => {
   const colors = {
-    manager: 'orange',
-    worker: 'blue'
+    MANAGER: 'orange',
+    WORKER: 'blue'
   }
   return colors[role] || 'grey'
 }

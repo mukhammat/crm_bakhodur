@@ -12,7 +12,7 @@ export interface IUserRoleService {
     getById(id: number): Promise<UserRolesType | undefined>;
     delete(id: number): Promise<number>
     update(id: number, data: UserRolesDto): Promise<number>
-    generateRegisterKey(roleId: number): Promise<string>
+    generateRegisterKey(roleTitle: string): Promise<string>
 }
 
 export class UserRoleService implements IUserRoleService {
@@ -58,9 +58,9 @@ export class UserRoleService implements IUserRoleService {
         return res.id
     }
 
-    async generateRegisterKey(roleId: number) {
+    async generateRegisterKey(roleTitle: string) {
         const role = await this.db.query.userRoles.findFirst({
-            where: eq(schema.userRoles.id, roleId),
+            where: eq(schema.userRoles.title, roleTitle),
         })
 
         if(!role) {

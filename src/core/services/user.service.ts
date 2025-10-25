@@ -1,6 +1,6 @@
-import { users, type DrizzleClient } from "../../database/index.js";
+import { users, userRoles, type DrizzleClient } from "../../database/index.js";
 import type { GetUserDto, ParamsType, RoleDto, UpdateDto } from "../dto/user.dto.js";
-import { and, eq } from "drizzle-orm";
+import { and, eq, type SQL } from "drizzle-orm";
 
 export interface IUserService {
   getAll(params?: ParamsType): Promise<GetUserDto[]>
@@ -14,10 +14,11 @@ export class UserService implements IUserService {
   constructor(private db: DrizzleClient) {}
 
   public async getAll(params?: ParamsType) {
-    const eqs = [];
+    const eqs: SQL[] = [];
 
     if(params?.role) {
-      eqs.push(eq(users.role, params.role))
+      const roleTitle = params.role.toUpperCase();
+      eqs.push(eq(userRoles.title, roleTitle));
     }
 
     return this.db
@@ -26,6 +27,9 @@ export class UserService implements IUserService {
     .findMany({
       columns: {
         hash: false
+      },
+      with: {
+        role: true
       },
       where: and(...eqs)
     })
@@ -52,6 +56,9 @@ export class UserService implements IUserService {
       where: eq(users.id, userId),
       columns: {
         hash: false
+      },
+      with: {
+        role: true
       }
     })
   }

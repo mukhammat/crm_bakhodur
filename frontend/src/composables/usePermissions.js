@@ -7,18 +7,18 @@ export function usePermissions() {
 
   const userRole = computed(() => auth.role)
   
-  const isAdmin = computed(() => userRole.value === 'admin')
-  const isManager = computed(() => userRole.value === 'manager')
-  const isWorker = computed(() => userRole.value === 'worker')
+  const isAdmin = computed(() => userRole.value === 'ADMIN')
+  const isManager = computed(() => userRole.value === 'MANAGER')
+  const isWorker = computed(() => userRole.value === 'WORKER')
   
-  const hasRole = (role) => userRole.value === role
+  const hasRole = (role) => userRole.value === role.toUpperCase()
   
-  const hasAnyRole = (roles) => roles.includes(userRole.value)
+  const hasAnyRole = (roles) => roles.map(r => r.toUpperCase()).includes(userRole.value)
   
-  const canManageUsers = computed(() => hasAnyRole(['admin', 'manager']))
-  const canCreateTasks = computed(() => hasAnyRole(['admin', 'manager']))
-  const canViewAllTasks = computed(() => hasAnyRole(['admin', 'manager']))
-  const canOnlyViewOwnTasks = computed(() => userRole.value === 'worker')
+  const canManageUsers = computed(() => hasAnyRole(['ADMIN', 'MANAGER']))
+  const canCreateTasks = computed(() => hasAnyRole(['ADMIN', 'MANAGER']))
+  const canViewAllTasks = computed(() => hasAnyRole(['ADMIN', 'MANAGER']))
+  const canOnlyViewOwnTasks = computed(() => userRole.value === 'WORKER')
 
   return {
     userRole,
