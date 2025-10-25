@@ -11,9 +11,8 @@ export const userRouter = (db: DrizzleClient) => {
   return new Hono()
   .use(requireAuth)
   .get('/me', userController.me)
-  .get('/', requireRole(['manager', 'admin']), userController.getAll)
-  .put('/', requireRole(['manager', 'admin']), userController.update)
-  .use(requireRole(['admin']))
-  .get("/register-key/:role", userController.generateRegisterKey)
+  .get('/', requireRole(['MANAGER', 'ADMIN']), userController.getAll)
+  .put('/', requireRole(['MANAGER', 'ADMIN']), userController.update)
+  .use(requireRole(['ADMIN']))
   .delete('/:id', userController.delete)
 };

@@ -6,8 +6,15 @@ async function main() {
   console.log('🌱 Seeding database...');
 
   const ROLES = {Admin: 'ADMIN', Manager: 'MANAGER', Worker: 'WORKER'} as const;
+  const STATUSES = {New: 'NEW'} as const;
 
   const userRoles  = await db.insert(schema.userRoles).values([
+    { title: STATUSES.New},
+  ])
+  .onConflictDoNothing()
+  .returning()
+
+  const taskStatus  = await db.insert(schema.taskStatuses).values([
     { title: ROLES.Admin},
     { title: ROLES.Manager },
     { title: ROLES.Worker },

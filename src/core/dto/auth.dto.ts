@@ -2,12 +2,7 @@ import type { InferResultType } from "../../database/index.js"
 
 type UserType = InferResultType<'users'>;
 
-export type RegisterDto = {
-    email: string,
-    password: string,
-    name: string,
+export type RegisterDto = Pick<UserType, 'email' | 'telegramId' | 'name'> & {
     key: string,
-    telegramId?: number
+    password: string,
 }
-
-export type UserRoleType = UserType['role'];

@@ -35,19 +35,19 @@ export const usersRelations = relations(users, ({ one }) => ({
   }),
 }));
 
-export const taskStatusEnum = t.pgEnum('task_status', ['pending', 'in_progress', 'completed']);
+export const taskStatusesRelations = relations(taskStatuses, ({ many }) => ({
+  tasks: many(tasks),
+}));
 
 export const tasks = table("tasks", {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
   title: t.varchar().notNull(),
   description: t.text('description').notNull(),
-  status: taskStatusEnum('status').notNull().default('pending'),
-  statusId: t.serial('status_id')
+  statusId: t.serial('status_id').default(1)
   //.notNull()
   .references(() => taskStatuses.id),
   createdAt: t.timestamp('created_at').notNull().defaultNow(),
   dueDate: t.timestamp('due_date'), // Срок выполнения задачи
-  priority: t.integer('priority').notNull().default(1), // Приоритет задачи
   createdBy: t.uuid('created_by')
   .notNull()
   .references(() => users.id, { onDelete: 'cascade' }),
@@ -77,5 +77,9 @@ export const tasksRelations = relations(tasks, ({ many, one }) => ({
   createdBy: one(users, {
     fields: [tasks.createdBy],
     references: [users.id],
+  }),
+  status: one(taskStatuses, {
+    fields: [tasks.statusId],
+    references: [taskStatuses.id],
   }),
 }))

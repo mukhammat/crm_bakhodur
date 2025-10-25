@@ -1,5 +1,5 @@
 import { users, userRoles, type DrizzleClient } from "../../database/index.js";
-import type { GetUserDto, ParamsType, RoleDto, UpdateDto } from "../dto/user.dto.js";
+import type { GetUserDto, ParamsType, UpdateDto } from "../dto/user.dto.js";
 import { and, eq, type SQL } from "drizzle-orm";
 
 export interface IUserService {
@@ -17,8 +17,10 @@ export class UserService implements IUserService {
     const eqs: SQL[] = [];
 
     if(params?.role) {
-      const roleTitle = params.role.toUpperCase();
-      eqs.push(eq(userRoles.title, roleTitle));
+      const role = await this.db.query.userRoles.findFirst({
+        where: eq(userRoles.title, params.role)
+      })
+      eqs.push(eq(users.roleId, role?.id!));
     }
 
     return this.db

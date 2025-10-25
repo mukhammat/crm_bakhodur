@@ -11,16 +11,12 @@ export class UserController {
 
     const params: { role?: RoleDto } = { };
 
-    if(role !== 'admin') {
-      params.role = 'worker';
-    }
-
     const users = await this.userService.getAll(params);
     return c.json({ data: { users } });
   }
 
   update = async (c: Context) => {
-    const id = c.req.param('id');
+    const { id } = c.get('jwtPayload');
     const { data }: {data: UpdateDto} = await c.req.json()
 
     await this.userService.update(id, data);

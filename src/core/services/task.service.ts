@@ -1,5 +1,5 @@
 import { and, eq, sql } from "drizzle-orm";
-import { taskAssignments, tasks, type DrizzleClient } from "../../database/index.js";
+import { taskAssignments, tasks, taskStatuses, type DrizzleClient } from "../../database/index.js";
 import { CustomError } from "../errors/custom.error.js";
 import type { CreateDto, ParamsType, UpdateDto, AssignmentLength, Assignment, TaskType } from "../dto/task.dto.js";
 
@@ -48,12 +48,8 @@ export class TaskService implements ITaskService {
       eqs.push(eq(tasks.createdBy, params.createdBy))
     }
 
-    if(params?.status) {
-      eqs.push(eq(tasks.status, params.status))
-    }
-
-    if(params?.priority) {
-      eqs.push(eq(tasks.priority, params.priority))
+    if(params?.statusId) {
+      eqs.push(eq(tasks.statusId, params.statusId))
     }
 
     if(params?.dueDate) {
@@ -149,13 +145,13 @@ export class TaskService implements ITaskService {
   public async getAssignmentLengthByUserId(userId: string) {
     const rows = await this.db
       .select({
-        status: tasks.status,
+        status: taskStatuses.title,
         count: sql<number>`count(*)`,
       })
       .from(tasks)
       .innerJoin(taskAssignments, eq(taskAssignments.taskId, tasks.id))
       .where(eq(taskAssignments.userId, userId))
-      .groupBy(tasks.status);
+      .groupBy(taskStatuses.title);
 
     return rows
   }

@@ -13,8 +13,8 @@ export const taskRouter = (db: DrizzleClient) => {
   return new Hono()
     .use(requireAuth)
     .use(requireRole([
-      'admin',
-      'manager'
+      'ADMIN',
+      'MANAGER'
     ]))
     .post("/", zValidator('json', CreateSchema), taskController.create)
     .get("/", taskController.getAll)
@@ -27,7 +27,7 @@ export const taskRouter = (db: DrizzleClient) => {
     .delete('/unassign-task-from-worker/:id', taskController.unassignTaskFromUser)
     .put("/:id", taskController.update)
     
-    .use(requireRole(['admin']))
+    .use(requireRole(['ADMIN']))
     .delete("/:id", taskController.delete)
     .get('/assignment-length/:id', taskController.getAssignmentLengthByUserId)
 };
