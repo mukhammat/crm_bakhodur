@@ -25,7 +25,7 @@ export const taskRouter = (db: DrizzleClient) => {
       taskController.assignTaskToUser
     )
     .delete('/unassign-task-from-worker/:id', taskController.unassignTaskFromUser)
-    .put("/:id", taskController.update)
+    .put("/:id", zValidator('json', UpdateSchema), taskController.update)
     
     .use(requireRole(['ADMIN']))
     .delete("/:id", taskController.delete)

@@ -4,13 +4,13 @@ import { CustomError } from "../errors/custom.error.js";
 import type { CreateDto, ParamsType, UpdateDto, AssignmentLength, Assignment, TaskType } from "../dto/task.dto.js";
 
 export interface ITaskService {
-  create(data: CreateDto): Promise<string>;
+  create(data: CreateDto): Promise<Pick<TaskType, 'id'>>;
   getById(id: string): Promise<TaskType | null>;
   getAll(params?: ParamsType): Promise<TaskType[]>;
-  update( id: string, data: UpdateDto ): Promise<string>;
-  delete(id: string): Promise<string>;
-  assignTaskToUser(taskId: string, userId: string): Promise<string>
-  unassignTaskFromUser(taskAssignmentId: string): Promise<string>
+  update( id: string, data: UpdateDto ): Promise<Pick<TaskType, "id">>;
+  delete(id: string): Promise<Pick<TaskType, "id">>;
+  assignTaskToUser(taskId: string, userId: string): Promise<Pick<Assignment, 'id'>>
+  unassignTaskFromUser(taskAssignmentId: string): Promise<Pick<Assignment, 'id'>>
   getAssignmentByUserId(id: string): Promise<Assignment[]>
   getAssignmentLengthByUserId(userId: string): Promise<AssignmentLength[]>
 }
@@ -23,10 +23,10 @@ export class TaskService implements ITaskService {
       .insert(tasks)
       .values(data)
       .returning({
-        id: tasks.id,
+        id: tasks.id
       });
 
-    return task.id;
+    return task;
   }
 
   public async getById(id: string) {
@@ -72,8 +72,6 @@ export class TaskService implements ITaskService {
         createdBy: {
           columns: {
             hash: false,
-            id: true,
-            name: true,
           }
         }
       },
@@ -85,12 +83,17 @@ export class TaskService implements ITaskService {
     id: string,
     data: UpdateDto
   ) {
-    await this.db
+    const [updated] = await this.db
       .update(tasks)
       .set(data)
       .where(eq(tasks.id, id))
+      .returning({ id: tasks.id });
 
-    return id;
+    if (!updated) {
+      throw new CustomError("Задача для обновления не найдена");
+    }
+
+    return updated;
   }
 
   public async delete(id: string) {
@@ -105,11 +108,17 @@ export class TaskService implements ITaskService {
       throw new CustomError("Задача для удаления не найдена");
     }
 
-    return deleted[0].id
+    return deleted[0];
   }
 
   public async assignTaskToUser(taskId: string, userId: string) {
-    const [ asign ] = await this.db
+    // Проверяем существование задачи
+    const task = await this.getById(taskId);
+    if (!task) {
+      throw new CustomError("Задача не найдена");
+    }
+
+    const [asign] = await this.db
     .insert(taskAssignments)
     .values({
       taskId,
@@ -119,18 +128,22 @@ export class TaskService implements ITaskService {
       id: taskAssignments.id
     })
 
-    return asign.id
+    return asign
   }
 
   public async unassignTaskFromUser(taskAssignmentId: string) {
-    const [ asign ] = await this.db
+    const [asign] = await this.db
     .delete(taskAssignments)
     .where(eq(taskAssignments.id, taskAssignmentId))
     .returning({
       id: taskAssignments.id
     })
 
-    return asign.id
+    if (!asign) {
+      throw new CustomError("Назначение задачи не найдено");
+    }
+
+    return asign
   }
 
   public async getAssignmentByUserId(id: string) {

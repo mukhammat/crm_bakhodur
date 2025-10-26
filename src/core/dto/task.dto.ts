@@ -2,7 +2,8 @@ import { type InferResultType } from '../../database/index.js'
 
 export type TaskType = InferResultType<'tasks'>;
 
-export type CreateDto = Pick<TaskType, 'title' | 'description' | 'createdBy'>
+export type CreateDto = Pick<TaskType, 'title' | 'description' | 'createdBy'> 
+& Partial<Pick<TaskType, 'dueDate'>>
 
 export type UpdateDto = Partial<Pick<TaskType, "title" | "description" | "statusId" | "dueDate">>;
 
@@ -12,7 +13,7 @@ Partial<Pick<TaskType, 'statusId' | 'createdBy' | 'dueDate' | 'createdAt'>> & {
 }
 
 export type AssignmentLength = {
-    status: "pending" | "in_progress" | "completed";
+    status: string;
     count: number;
 }
 
