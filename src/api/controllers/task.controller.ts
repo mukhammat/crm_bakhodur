@@ -13,7 +13,7 @@ export class TaskController {
     const task = await this.taskService
     .create({ ...data, createdBy: id });
 
-    return c.json({ task }, 201);
+    return c.json({ task: task }, 201);
   };
 
   getById = async (c: Context) => {

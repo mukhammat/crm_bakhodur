@@ -22,7 +22,7 @@ export class TaskCallback {
             const assignment = await this.taskService.getAssignmentByUserId(ctx.user.id);
             if(assignment) {
                 for (const element of assignment) {
-                    if(element.task.status === 'in_progress') {
+                    if(element.task.statusId === 2) {
                         await ctx.reply('Вы не можете выполнять несколько зачаь одновременно!')
                         close = true
                     }
@@ -34,7 +34,7 @@ export class TaskCallback {
             }
             
             await this.taskService.update(taskId, {
-                status: 'in_progress',
+                statusId: 2,
             });
 
             await ctx.reply('Вы взяли задачу на выполнения!')
@@ -52,7 +52,7 @@ export class TaskCallback {
             const [_, taskId] = data.split(':');
             console.log('Extracted taskId:', taskId);
             await this.taskService.update(taskId, {
-                status: 'completed'
+                statusId: 3
             });
         } catch(error) {
             console.log(error)

@@ -7,19 +7,20 @@ export class UserController {
   constructor(private userService: IUserService) {}
 
   getAll = async (c: ContextJWT) => {
-    const { role } = c.get('jwtPayload');
+    const { roleId } = c.get('jwtPayload');
 
-    const params: { role?: RoleDto } = { };
+    // filter by role id
+    const params: { roleId?: RoleDto } = { roleId };
 
     const users = await this.userService.getAll(params);
-    return c.json({ data: { users } });
+    return c.json({ users });
   }
 
-  update = async (c: Context) => {
+  update = async (c: ContextJWT) => {
     const { id } = c.get('jwtPayload');
-    const { data }: {data: UpdateDto} = await c.req.json()
+    const body: UpdateDto = await c.req.json();
 
-    await this.userService.update(id, data);
+    await this.userService.update(id, body);
 
     return c.json({ data: { id } });
   }
@@ -43,7 +44,7 @@ export class UserController {
     const user = await this.userService.getById(id);
 
     return c.json({
-      data: user || null
+      user
     })
   }
 }

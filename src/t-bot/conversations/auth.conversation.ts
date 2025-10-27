@@ -28,7 +28,7 @@ export class AuthConversation {
             email: ctx.chat?.id.toString() || "",
             hash: "0",
             name,
-            role: role,
+            roleId: 3, // WORKER role
             telegramId: ctx.chatId || 0
         }).returning({
             id: users.id,

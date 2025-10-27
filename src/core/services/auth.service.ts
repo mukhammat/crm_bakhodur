@@ -4,12 +4,12 @@ import { and, eq } from "drizzle-orm";
 import { type StringValue } from 'ms';
 import { users, userRoles, type DrizzleClient } from "../../database/index.js";
 import { redis } from '../../cache/redis.js'
-import type { RegisterDto } from "../dto/auth.dto.js";
+import type { RegisterDto, ReturnType } from "../dto/auth.dto.js";
 import { CustomError } from "../errors/custom.error.js";
 
 export interface IAuthService {
-    login(email: string, password: string): Promise<{token: string, expiresIn: string}>;
-    register(dto: RegisterDto): Promise<string>;
+    login(email: string, password: string): Promise<ReturnType>;
+    register(dto: RegisterDto): Promise<ReturnType>;
 }
 
 export class AuthService implements IAuthService {
@@ -24,8 +24,10 @@ export class AuthService implements IAuthService {
         .users
         .findFirst({
             where: and(eq(users.email, email)),
-            with: {
-                role: true
+            columns: {
+                id: true,
+                roleId: true,
+                hash: true
             }
         });
 
@@ -47,10 +49,10 @@ export class AuthService implements IAuthService {
         const token = this.generateJwt({
             id: user.id,
             email,
-            role: user.role.title
+            roleId: user.roleId
         }, "24h");
 
-        return { token, expiresIn: '24h'};
+        return { token, expiresIn: '24h', user: { id: user.id, roleId: user.roleId }};
     }
 
     public async register({
@@ -60,17 +62,21 @@ export class AuthService implements IAuthService {
         key,
         telegramId,
     }: RegisterDto) {
-        const roleTitle = await redis.get(`register_key:${key}`);
+        const roleValue = await redis.get(`register_key:${key}`);
 
-        if (!roleTitle) {
+        if (!roleValue) {
             throw new CustomError('Ключ регистрации не найден!');
         }
 
-        // Получаем roleId из таблицы userRoles
-        const [role] = await this.db
-            .select()
-            .from(userRoles)
-            .where(eq(userRoles.title, roleTitle));
+        // roleValue can be either role id (stored by user-role service) or role title
+        let role;
+        if (/^\d+$/.test(roleValue)) {
+            // numeric id
+            const id = Number(roleValue);
+            role = await this.db.query.userRoles.findFirst({ where: eq(userRoles.id, id) });
+        } else {
+            role = await this.db.query.userRoles.findFirst({ where: eq(userRoles.title, roleValue) });
+        }
 
         if (!role) {
             throw new CustomError('Указанная роль не найдена в системе!');
@@ -78,7 +84,7 @@ export class AuthService implements IAuthService {
 
         const hash = await this.hashPassword(password);
 
-        return this.db.transaction(async (tx) => {
+        const user = await this.db.transaction(async (tx) => {
             const [newUser] = await tx
             .insert(users)
             .values({
@@ -89,12 +95,21 @@ export class AuthService implements IAuthService {
                 telegramId
             })
             .returning({
-                id: users.id
+                id: users.id,
+                roleId: users.roleId
             });
 
 
-            return newUser.id;
+            return newUser;
         })
+
+        const token = this.generateJwt({
+            id: user.id,
+            email,
+            roleId: user.roleId
+        }, "24h");
+
+        return { token, expiresIn: '24h', user };
     }
 
     private async hashPassword(password: string): Promise<string> {

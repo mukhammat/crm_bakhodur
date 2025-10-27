@@ -24,21 +24,6 @@ export const users = table("users", {
   telegramId: t.integer('telegram_id').unique(),
 });
 
-export const userRolesRelations = relations(userRoles, ({ many }) => ({
-  users: many(users),
-}));
-
-export const usersRelations = relations(users, ({ one }) => ({
-  role: one(userRoles, {
-    fields: [users.roleId],
-    references: [userRoles.id],
-  }),
-}));
-
-export const taskStatusesRelations = relations(taskStatuses, ({ many }) => ({
-  tasks: many(tasks),
-}));
-
 export const tasks = table("tasks", {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
   title: t.varchar().notNull(),
@@ -61,6 +46,27 @@ export const taskAssignments = table("task_assignments", {
   uniq: t.unique().on(table.taskId, table.userId)
 }));
 
+export const permissions = table('permissions', {
+  id: t.uuid().primaryKey().notNull().defaultRandom(),
+  title: t.varchar().notNull(),
+})
+
+export const userPermissions = table('user_permissions', {
+  id: t.uuid().primaryKey().notNull().defaultRandom(),
+  userId: t.uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  permissionId: t.uuid('permission_id').notNull().references(() => permissions.id, { onDelete: 'cascade' })
+}, (table) => ({
+  uniq: t.unique().on(table.permissionId, table.userId)
+}))
+
+export const rolePermissions = table('role_permissions', {
+  id: t.uuid().primaryKey().notNull().defaultRandom(),
+  roleId: t.serial('role_id').references(() => userRoles.id, { onDelete: 'cascade' }),
+  permissionId: t.uuid('permission_id').notNull().references(() => permissions.id, { onDelete: 'cascade' })
+}, (table) => ({
+  uniq: t.unique().on(table.permissionId, table.roleId)
+}))
+
 export const taskAssignmentsRelations = relations(taskAssignments, ({ one }) => ({
   task: one(tasks, {
     fields: [taskAssignments.taskId],
@@ -70,6 +76,21 @@ export const taskAssignmentsRelations = relations(taskAssignments, ({ one }) => 
     fields: [taskAssignments.userId],
     references: [users.id],
   }),
+}));
+
+export const userRolesRelations = relations(userRoles, ({ many }) => ({
+  users: many(users),
+}));
+
+export const usersRelations = relations(users, ({ one }) => ({
+  role: one(userRoles, {
+    fields: [users.roleId],
+    references: [userRoles.id],
+  }),
+}));
+
+export const taskStatusesRelations = relations(taskStatuses, ({ many }) => ({
+  tasks: many(tasks),
 }));
 
 export const tasksRelations = relations(tasks, ({ many, one }) => ({
@@ -82,4 +103,31 @@ export const tasksRelations = relations(tasks, ({ many, one }) => ({
     fields: [tasks.statusId],
     references: [taskStatuses.id],
   }),
+}))
+
+export const permissionsRelations = relations(permissions, ({ many }) => ({
+  userPermissions: many(userPermissions),
+  rolePermissions: many(rolePermissions)
+}))
+
+export const userPermissionsRelations = relations(userPermissions, ({ one }) => ({
+  user: one(users, {
+    fields: [userPermissions.userId],
+    references: [users.id]
+  }),
+  permission: one(permissions, {
+    fields: [userPermissions.permissionId],
+    references: [permissions.id]
+  })
+}))
+
+export const rolePermissionsRelations = relations(rolePermissions, ({ one }) => ({
+  role: one(userRoles, {
+    fields: [rolePermissions.roleId],
+    references: [userRoles.id]
+  }),
+  permission: one(permissions, {
+    fields: [rolePermissions.permissionId],
+    references: [permissions.id]
+  })
 }))

@@ -7,13 +7,13 @@ export class AuthController {
 
     login = async (c: Context) => {
         const { email, password } = await c.req.json();
-        const token = await this.authService.login(email, password);
-        return c.json({ data: token });
+        const returnData = await this.authService.login(email, password);
+        return c.json(returnData);
     }
 
     register = async (c: Context) => {
         const dto = await c.req.json();
-        const userId = await this.authService.register(dto);
-        return c.json({ data: { userId } }, 201);
+        const returnData = await this.authService.register(dto);
+        return c.json(returnData, 201);
     }
 }

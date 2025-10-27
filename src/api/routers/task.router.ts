@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import type { DrizzleClient } from "../../database/index.js";
 import { TaskService } from "../../core/services/task.service.js";
 import { TaskController } from "../controllers/task.controller.js";
-import { requireAuth } from '../middleware/require-auth.js';
-import { requireRole } from "../middleware/require-role.js";
+import { requireAuth } from '../middlewares/require-auth.js';
+import { requireRole } from "../middlewares/require-role.js";
 import { zValidator } from "@hono/zod-validator";
 import { CreateSchema, UpdateSchema, AssignTaskToUserSchema } from '../../core/schemas/task.schema.js'
 

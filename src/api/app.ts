@@ -21,8 +21,8 @@ app
 .route("/user-roles", userRoleRouter(db))
 
 // Global handlers
-import { errorHandler } from './middleware/error-handler.js'
-import { notFound } from './middleware/not-found.js'
+import { errorHandler } from './middlewares/error-handler.js'
+import { notFound } from './middlewares/not-found.js'
 
 app
 .onError(errorHandler)
@@ -30,7 +30,7 @@ app
 
 serve({
   fetch: app.fetch,
-  port: 3322
+  port: Number(process.env.PORT!)
 }, (info) => {
   console.log(`Server is running on http://localhost:${info.port}`)
 })

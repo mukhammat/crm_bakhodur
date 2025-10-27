@@ -19,8 +19,8 @@ export const CreateSchema = z.object({
 export const UpdateSchema = z.object({
     title: title.optional(),
     description: description.optional(),
-    status: z.enum(["pending", "in_progress", "completed"]).optional(),
-    dueDate: z.date().nullable().optional(),
+    statusId: z.string().uuid().optional(),
+    dueDate: z.string().datetime().nullable().optional(),
 });
 
 export const AssignTaskToUserSchema = z.object({

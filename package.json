@@ -10,7 +10,8 @@
     "start:front": "cd ./frontend && pm2 start dist/index.js --name crm_bakhodur_front",
     "generate": "npx drizzle-kit generate",
     "migrate": "npx drizzle-kit migrate",
-    "genmig": "npm run generate && npm run migrate"
+    "genmig": "npm run generate && npm run migrate",
+    "test": "vitest"
   },
   "dependencies": {
     "@grammyjs/conversations": "^2.1.0",
@@ -34,6 +35,7 @@
     "@types/pg": "^8.15.5",
     "drizzle-kit": "^0.31.4",
     "tsx": "^4.7.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^1.6.1"
   }
 }

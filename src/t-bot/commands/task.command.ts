@@ -29,15 +29,15 @@ export class TaskCommand {
             const task = v.task;
             let message = `Задание №${c}\n${task.title}\n${task.description}\n`;
 
-            if(v.task.status === 'in_progress') {
+            if(v.task.statusId === 2) {
                 inline.text('Закончить', `complete:${v.taskId}`)
             }
 
-            if(v.task.status === 'pending') {
+            if(v.task.statusId === 1) {
                 inline.text('Приступить', `take:${v.taskId}`)
             }
 
-            if(v.task.status === 'completed') {
+            if(v.task.statusId === 3) {
                 message = message + '\n✅ Выполнено'
             }
 
@@ -49,7 +49,7 @@ export class TaskCommand {
         if(!ctx.user?.id) return;
 
         const tasks = await this.taskService.getAll({
-            status: 'completed'
+            statusId: 3
         })
 
         let c = 0;
@@ -60,7 +60,7 @@ export class TaskCommand {
             const task = v;
             let message = `Задание №${c}\n${task.title}\n${task.description}\n`;
 
-            if(v.status === 'completed') {
+            if(v.statusId === 3) {
                 message = message + '\n✅ Выполнено'
             }
 
@@ -72,7 +72,7 @@ export class TaskCommand {
         if(!ctx.user?.id) return;
 
         const tasks = await this.taskService.getAll({
-            status: 'pending'
+            statusId: 1
         })
 
         let c = 0;
@@ -83,15 +83,15 @@ export class TaskCommand {
             const task = v;
             let message = `Задание №${c}\n${task.title}\n${task.description}\n`;
 
-            if(v.status === 'in_progress') {
+            if(v.statusId === 2) {
                 inline.text('Закончить', `complete:${v.id}`)
             }
 
-            if(v.status === 'pending') {
+            if(v.statusId === 1) {
                 inline.text('Приступить', `take:${v.id}`)
             }
 
-            if(v.status === 'completed') {
+            if(v.statusId === 3) {
                 message = message + '\n✅ Выполнено'
             }
 
@@ -103,7 +103,7 @@ export class TaskCommand {
         if(!ctx.user?.id) return;
 
         const tasks = await this.taskService.getAll({
-            status: 'in_progress'
+            statusId: 2
         })
 
         let c = 0;
@@ -114,15 +114,15 @@ export class TaskCommand {
             const task = v;
             let message = `Задание №${c}\n${task.title}\n${task.description}\n`;
 
-            if(v.status === 'in_progress') {
+            if(v.statusId === 2) {
                 inline.text('Закончить', `complete:${v.id}`)
             }
 
-            if(v.status === 'pending') {
+            if(v.statusId === 1) {
                 inline.text('Приступить', `take:${v.id}`)
             }
 
-            if(v.status === 'completed') {
+            if(v.statusId === 3) {
                 message = message + '\n✅ Выполнено'
             }
 

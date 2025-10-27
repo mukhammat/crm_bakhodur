@@ -9,8 +9,8 @@ export type Role = {
     title: string;
 }
 
-export type RoleDto = Role['title']
+export type RoleDto = Role['id']
 
 export type ParamsType = {
-    role?: string
+    roleId?: number
 }

@@ -18,7 +18,7 @@ export function notificationEvents(
       
         const task = await taskService.getById(taskId);
     
-        if(task?.status !== 'pending') {
+        if(task?.statusId !== 1) {
           console.log('Task is not pending, skipping notification.');
           return;
         }

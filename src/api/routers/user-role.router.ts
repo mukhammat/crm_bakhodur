@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { UserRoleController } from "../controllers/user-role.controller.js";
-import { requireAuth } from "../middleware/require-auth.js";
-import { requireRole } from "../middleware/require-role.js";
+import { requireAuth } from "../middlewares/require-auth.js";
+import { requireRole } from "../middlewares/require-role.js";
 import { UserRoleService } from "../../core/services/user-role.service.js";
 import type { DrizzleClient } from "../../database/index.js";
 
