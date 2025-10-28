@@ -48,7 +48,7 @@ export const taskAssignments = table("task_assignments", {
 
 export const permissions = table('permissions', {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
-  title: t.varchar().notNull(),
+  title: t.varchar().notNull().unique(),
 })
 
 export const userPermissions = table('user_permissions', {
@@ -80,13 +80,15 @@ export const taskAssignmentsRelations = relations(taskAssignments, ({ one }) => 
 
 export const userRolesRelations = relations(userRoles, ({ many }) => ({
   users: many(users),
+  rolePermissions: many(rolePermissions)
 }));
 
-export const usersRelations = relations(users, ({ one }) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
   role: one(userRoles, {
     fields: [users.roleId],
     references: [userRoles.id],
   }),
+  userPermissions: many(userPermissions)
 }));
 
 export const taskStatusesRelations = relations(taskStatuses, ({ many }) => ({

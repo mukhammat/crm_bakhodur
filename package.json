@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev:server": "tsx watch src/index.ts",
-    "dev:front": "cd ./frontend && npm run serve",
+    "dev:front": "cd ./frontend && npm run dev",
     "build:server": "tsc",
     "build:front": "cd ./frontend && npm run build",
     "start:server": "pm2 start dist/index.js --name crm_bakhodur_server",
