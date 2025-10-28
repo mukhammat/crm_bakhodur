@@ -1,6 +1,6 @@
 import { and, eq, sql } from "drizzle-orm";
-import { taskAssignments, tasks, taskStatuses, type DrizzleClient } from "../../database/index.js";
-import { CustomError } from "../errors/custom.error.js";
+import { taskAssignments, tasks, taskStatuses, type DrizzleClient } from "../../../database/index.js";
+import { CustomError } from "../../errors/custom.error.js";
 import type { CreateDto, ParamsType, UpdateDto, AssignmentLength, Assignment, TaskType } from "../dto/task.dto.js";
 
 export interface ITaskService {
@@ -9,6 +9,10 @@ export interface ITaskService {
   getAll(params?: ParamsType): Promise<TaskType[]>;
   update( id: string, data: UpdateDto ): Promise<Pick<TaskType, "id">>;
   delete(id: string): Promise<Pick<TaskType, "id">>;
+  assignTaskToUser(taskId: string, userId: string): Promise<Pick<Assignment, 'id'>>
+  unassignTaskFromUser(taskAssignmentId: string): Promise<Pick<Assignment, 'id'>>
+  getAssignmentByUserId(id: string): Promise<Assignment[]>
+  getAssignmentLengthByUserId(userId: string): Promise<AssignmentLength[]>
 }
 
 export class TaskService implements ITaskService {
@@ -105,5 +109,63 @@ export class TaskService implements ITaskService {
     }
 
     return deleted[0];
+  }
+
+  public async assignTaskToUser(taskId: string, userId: string) {
+    // Проверяем существование задачи
+    const task = await this.getById(taskId);
+    if (!task) {
+      throw new CustomError("Задача не найдена");
+    }
+
+    const [asign] = await this.db
+    .insert(taskAssignments)
+    .values({
+      taskId,
+      userId
+    })
+    .returning({
+      id: taskAssignments.id
+    })
+
+    return asign
+  }
+
+  public async unassignTaskFromUser(taskAssignmentId: string) {
+    const [asign] = await this.db
+    .delete(taskAssignments)
+    .where(eq(taskAssignments.id, taskAssignmentId))
+    .returning({
+      id: taskAssignments.id
+    })
+
+    if (!asign) {
+      throw new CustomError("Назначение задачи не найдено");
+    }
+
+    return asign
+  }
+
+  public async getAssignmentByUserId(id: string) {
+    return this.db.query.taskAssignments.findMany({
+      where: eq(taskAssignments.userId, id),
+      with: {
+        task: true
+      }
+    })
+  }
+
+  public async getAssignmentLengthByUserId(userId: string) {
+    const rows = await this.db
+      .select({
+        status: taskStatuses.title,
+        count: sql<number>`count(*)`,
+      })
+      .from(tasks)
+      .innerJoin(taskAssignments, eq(taskAssignments.taskId, tasks.id))
+      .where(eq(taskAssignments.userId, userId))
+      .groupBy(taskStatuses.title);
+
+    return rows
   }
 }

@@ -1,5 +1,5 @@
 import { users, userRoles, type DrizzleClient } from "../../../database/index.js";
-import type { GetUserDto, ParamsType, UpdateDto } from "../../dto/user.dto.js";
+import type { GetUserDto, ParamsType, UpdateDto } from "../dto/user.dto.js";
 import { and, eq, type SQL } from "drizzle-orm";
 import { CustomError } from "../../errors/custom.error.js";
 

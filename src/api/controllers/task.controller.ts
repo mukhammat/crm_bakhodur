@@ -53,30 +53,4 @@ export class TaskController {
     const deleted = await this.taskService.delete(id);
     return c.json({ task: deleted });
   };
-
-  assignTaskToUser = async (c: Context) => {
-    const { taskId, userId } 
-    : { taskId: string, userId: string } 
-    = await c.req.json();
-
-    const taskAssignment = await this.taskService.assignTaskToUser(taskId, userId);
-    eventBus.emit('task.assigned', { taskId, userId });
-    return c.json({ taskAssignment });
-  }
-
-  unassignTaskFromUser = async (c: Context) => {
-    const { id } = c.req.param();
-
-    const taskAssignment = await this.taskService.unassignTaskFromUser(id);
-
-    return c.json({ taskAssignment });
-  }
-
-  getAssignmentLengthByUserId = async (c: Context) => {
-    const { id } = c.req.param();
-
-    const rows = await this.taskService.getAssignmentLengthByUserId(id);
-
-    return c.json({ rows });
-  }
 }

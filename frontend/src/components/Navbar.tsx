@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { LogOut, LayoutDashboard, ClipboardList, Users } from 'lucide-react';
+import { LogOut, LayoutDashboard, ClipboardList, Users, Settings } from 'lucide-react';
 import { clsx } from 'clsx';
 
 export default function Navbar() {
@@ -14,6 +14,10 @@ export default function Navbar() {
   ];
 
   const isAdmin = user?.roleId === 1; // Assuming ADMIN roleId is 1
+
+  if (isAdmin) {
+    navItems.push({ path: '/settings', icon: Settings, label: 'Настройки' });
+  }
 
   return (
     <nav className="bg-white border-b border-gray-200 shadow-sm">

@@ -203,6 +203,7 @@ function TaskModal({
     description: task?.description || '',
     statusId: task?.statusId || 1,
     dueDate: task?.dueDate ? task.dueDate.split('T')[0] : '',
+    assigneeId: '', // Новое поле для исполнителя
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -211,16 +212,20 @@ function TaskModal({
     setIsSubmitting(true);
 
     try {
-      const data = {
-        ...formData,
-        dueDate: formData.dueDate || undefined,
-      };
-
       if (task) {
-        await apiClient.updateTask(task.id, data);
+        // Обновление существующей задачи
+        const { assigneeId, ...updateData } = formData;
+        await apiClient.updateTask(task.id, updateData);
         toast.success('Задача обновлена');
       } else {
-        await apiClient.createTask(data);
+        // Создание новой задачи
+        await apiClient.createTask({
+          title: formData.title,
+          description: formData.description,
+          statusId: formData.statusId,
+          dueDate: formData.dueDate || undefined,
+          assigneeId: formData.assigneeId || undefined,
+        });
         toast.success('Задача создана');
       }
 
@@ -261,6 +266,22 @@ function TaskModal({
                 rows={4}
                 className="input"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Исполнитель (опционально)</label>
+              <select
+                value={formData.assigneeId}
+                onChange={(e) => setFormData({ ...formData, assigneeId: e.target.value })}
+                className="input"
+              >
+                <option value="">Не назначено</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

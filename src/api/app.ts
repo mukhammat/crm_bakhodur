@@ -12,6 +12,7 @@ const app = new Hono()
 import { authRouter } from './routers/auth.router.js'
 import { taskRouter } from './routers/task.router.js'
 import { taskStatusRouter } from './routers/task-status.router.js'
+import { taskAssignmentRouter } from './routers/task-assignment.router.js'
 import { userRouter } from "./routers/user.router.js";
 import { userRoleRouter } from "./routers/user-role.router.js";
 import { permissionRouter } from "./routers/permission.router.js";
@@ -20,6 +21,7 @@ app
 .route('/auth', authRouter(db))
 .route("/tasks", taskRouter(db))
 .route('/task-statuses', taskStatusRouter(db))
+.route('/task-assignments', taskAssignmentRouter(db))
 .route("/users", userRouter(db))
 .route("/user-roles", userRoleRouter(db))
 .route("/permissions", permissionRouter(db))

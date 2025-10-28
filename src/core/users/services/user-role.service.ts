@@ -4,7 +4,7 @@ import { schema } from "../../../database/index.js";
 import { randomBytes } from "crypto";
 import { redis } from "../../../cache/redis.js";
 import { CustomError } from "../../errors/custom.error.js";
-import type { UserRolesDto, UserRolesType } from "../../dto/user-role.dto.js";
+import type { UserRolesDto, UserRolesType } from "../dto/user-role.dto.js";
 
 export interface IUserRoleService {
     create(data: UserRolesDto): Promise<number>;

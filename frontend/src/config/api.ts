@@ -34,6 +34,11 @@ export interface UserRole {
   title: string;
 }
 
+export interface Permission {
+  id: string;
+  title: string;
+}
+
 export interface TaskAssignment {
   id: string;
   taskId: string;
@@ -59,6 +64,7 @@ export interface CreateTaskData {
   description: string;
   statusId?: number;
   dueDate?: string;
+  assigneeId?: string;
 }
 
 export interface UpdateTaskData extends CreateTaskData {}

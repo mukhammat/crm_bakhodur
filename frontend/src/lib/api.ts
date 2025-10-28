@@ -11,6 +11,7 @@ import {
   AssignTaskData,
   TaskStatus,
   UserRole,
+  Permission,
 } from '../config/api';
 
 class ApiClient {
@@ -88,7 +89,22 @@ class ApiClient {
 
   // Tasks
   async createTask(taskData: CreateTaskData): Promise<Task> {
-    const { data } = await this.client.post('/tasks', taskData);
+    // Remove assigneeId from task data as it's handled separately
+    const { assigneeId, ...taskPayload } = taskData;
+    const { data } = await this.client.post('/tasks', taskPayload);
+    
+    // If assigneeId is provided, assign the task after creation
+    if (assigneeId && data.task?.id) {
+      try {
+        await this.assignTask({
+          taskId: data.task.id,
+          userId: assigneeId
+        });
+      } catch (error) {
+        console.error('Failed to assign task:', error);
+      }
+    }
+    
     return data.task;
   }
 
@@ -126,6 +142,68 @@ class ApiClient {
   async generateKey(role: string): Promise<string> {
     const { data } = await this.client.get(`/user-roles/generate-key/${role}`);
     return data.data.key;
+  }
+
+  async getUserRoles(): Promise<UserRole[]> {
+    const { data } = await this.client.get('/user-roles');
+    return data.userRoles;
+  }
+
+  async createUserRole(title: string): Promise<UserRole> {
+    const { data } = await this.client.post('/user-roles', { title });
+    return data.userRole;
+  }
+
+  async updateUserRole(id: number, title: string): Promise<UserRole> {
+    const { data } = await this.client.put(`/user-roles/${id}`, { title });
+    return data.userRole;
+  }
+
+  async deleteUserRole(id: number) {
+    const { data } = await this.client.delete(`/user-roles/${id}`);
+    return data;
+  }
+
+  // Task Statuses
+  async getTaskStatuses(): Promise<TaskStatus[]> {
+    const { data } = await this.client.get('/task-statuses');
+    return data.taskStatuses;
+  }
+
+  async createTaskStatus(title: string): Promise<TaskStatus> {
+    const { data } = await this.client.post('/task-statuses', { title });
+    return data.taskStatus;
+  }
+
+  async updateTaskStatus(id: number, title: string): Promise<TaskStatus> {
+    const { data } = await this.client.put(`/task-statuses/${id}`, { title });
+    return data.taskStatus;
+  }
+
+  async deleteTaskStatus(id: number) {
+    const { data } = await this.client.delete(`/task-statuses/${id}`);
+    return data;
+  }
+
+  // Permissions
+  async getPermissions(): Promise<Permission[]> {
+    const { data } = await this.client.get('/permissions');
+    return data.permissions;
+  }
+
+  async createPermission(title: string): Promise<Permission> {
+    const { data } = await this.client.post('/permissions', { title });
+    return data.permission;
+  }
+
+  async updatePermission(id: string, title: string): Promise<Permission> {
+    const { data } = await this.client.put(`/permissions/${id}`, { title });
+    return data.permission;
+  }
+
+  async deletePermission(id: string) {
+    const { data } = await this.client.delete(`/permissions/${id}`);
+    return data;
   }
 }
 

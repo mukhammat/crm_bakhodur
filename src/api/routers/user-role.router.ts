@@ -13,7 +13,13 @@ export function userRoleRouter(db: DrizzleClient) {
     router.use(requireAuth);
     router.use(requirePermission(['MANAGE_PERMISSIONS']));
 
-    router.get('/generate-key/:role', controller.generateRegisterKey);
+    router
+        .get('/', controller.getAll)
+        .get('/:id', controller.getById)
+        .post('/', controller.create)
+        .put('/:id', controller.update)
+        .delete('/:id', controller.delete)
+        .get('/generate-key/:role', controller.generateRegisterKey);
 
     return router;
 }

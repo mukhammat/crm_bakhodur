@@ -1,4 +1,3 @@
-import type { Context } from "hono";
 import type { ContextJWT } from '../types/context-jwt.js'
 import type { IUserService } from "../../core/services/user.service.js";
 import type { RoleDto, UpdateDto } from "../../core/dto/user.dto.js";
