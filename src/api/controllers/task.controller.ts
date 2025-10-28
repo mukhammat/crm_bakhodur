@@ -10,8 +10,14 @@ export class TaskController {
     const data = await c.req.json();
     const { id } = c.get('jwtPayload');
     
-    const task = await this.taskService
-    .create({ ...data, createdBy: id });
+    // Convert dueDate string to Date object if provided
+    const processedData = {
+      ...data,
+      createdBy: id,
+      dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+    };
+    
+    const task = await this.taskService.create(processedData);
 
     return c.json({ task: task }, 201);
   };
@@ -31,7 +37,14 @@ export class TaskController {
   update = async (c: Context) => {
     const id = c.req.param("id");
     const body = await c.req.json();
-    const task = await this.taskService.update(id, body);
+    
+    // Convert dueDate string to Date object if provided
+    const processedData: any = { ...body };
+    if (body.dueDate !== undefined) {
+      processedData.dueDate = body.dueDate ? new Date(body.dueDate) : null;
+    }
+    
+    const task = await this.taskService.update(id, processedData);
     return c.json({ task });
   };
 
