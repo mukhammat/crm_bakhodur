@@ -28,6 +28,24 @@ export class TaskService implements ITaskService {
   public async getById(id: string) {
     const task = await this.db.query.tasks.findFirst({
       where: eq(tasks.id, id),
+      with: {
+        assignments: {
+          with: {
+            user: {
+              columns: {
+                hash: false,
+                name: true,
+                id: true,
+              }
+            },
+          }
+        },
+        createdBy: {
+          columns: {
+            hash: false,
+          }
+        }
+      }
     });
 
     if (!task) {

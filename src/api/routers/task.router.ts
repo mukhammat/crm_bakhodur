@@ -5,7 +5,9 @@ import { TaskController } from "../controllers/task.controller.js";
 import { requireAuth } from '../middlewares/require-auth.js';
 import { requirePermission } from "../middlewares/require-permission.js";
 import { zValidator } from "@hono/zod-validator";
-import { CreateSchema, UpdateSchema, AssignTaskToUserSchema } from '../../core/schemas/task.schema.js'
+import { CreateSchema, UpdateSchema } from '../../core/schemas/task.schema.js'
+
+// Note: Task assignment endpoints have been moved to task-assignment.router.ts
 
 export const taskRouter = (db: DrizzleClient) => {
   const taskController = new TaskController(new TaskService(db));
@@ -17,15 +19,8 @@ export const taskRouter = (db: DrizzleClient) => {
     .get("/:id", taskController.getById)
     .use(requirePermission(['CREATE_TASKS']))
     .post("/", zValidator('json', CreateSchema), taskController.create)
-    .post(
-      '/assign-task-worker',
-      zValidator('json', AssignTaskToUserSchema),
-      taskController.assignTaskToUser
-    )
-    .delete('/unassign-task-from-worker/:id', taskController.unassignTaskFromUser)
     .use(requirePermission(['UPDATE_TASKS']))
     .put("/:id", zValidator('json', UpdateSchema), taskController.update)
     .use(requirePermission(['DELETE_TASKS']))
     .delete("/:id", taskController.delete)
-    .get('/assignment-length/:id', taskController.getAssignmentLengthByUserId)
 };

@@ -11,18 +11,15 @@ export const taskAssignmentRouter = (db: DrizzleClient) => {
 
     router.use(requireAuth)
     
-    // Для просмотра назначений нужно право на просмотр задач
-    router.use(requirePermission(['VIEW_TASKS']))
-    
-    // Для назначения/отмены назначения нужно право на управление задачами
-    router.post('/', requirePermission(['MANAGE_TASKS']), controller.create)
-    router.delete('/:id', requirePermission(['MANAGE_TASKS']), controller.delete)
-    
     // Получение назначений по ID пользователя
-    router.get('/user/:userId', controller.getByUserId)
+    router.get('/user/:userId', requirePermission(['VIEW_TASKS']), controller.getByUserId)
 
     // Получение статистики назначений по ID пользователя
-    router.get('/user/:userId/length', controller.getLengthByUserId)
+    router.get('/user/:userId/length', requirePermission(['VIEW_TASKS']), controller.getLengthByUserId)
+    
+    // Для назначения/отмены назначения нужны соответствующие разрешения
+    router.post('/', requirePermission(['CREATE_TASKS']), controller.create)
+    router.delete('/:id', requirePermission(['UPDATE_TASKS']), controller.delete)
 
     return router
 }

@@ -102,6 +102,7 @@ class ApiClient {
         });
       } catch (error) {
         console.error('Failed to assign task:', error);
+        // Don't throw error, task is created anyway
       }
     }
     
@@ -129,12 +130,12 @@ class ApiClient {
   }
 
   async assignTask(assignmentData: AssignTaskData) {
-    const { data } = await this.client.post('/tasks/assign-task-worker', assignmentData);
+    const { data } = await this.client.post('/task-assignments', assignmentData);
     return data;
   }
 
   async unassignTask(assignmentId: string) {
-    const { data } = await this.client.delete(`/tasks/unassign-task-from-worker/${assignmentId}`);
+    const { data } = await this.client.delete(`/task-assignments/${assignmentId}`);
     return data;
   }
 
@@ -203,6 +204,42 @@ class ApiClient {
 
   async deletePermission(id: string) {
     const { data } = await this.client.delete(`/permissions/${id}`);
+    return data;
+  }
+
+  // Role Permissions
+  async getRolePermissions(roleId: number): Promise<Permission[]> {
+    const { data } = await this.client.get(`/role-permissions/${roleId}`);
+    return data.permissions;
+  }
+
+  async assignPermissionToRole(roleId: number, permissionId: string) {
+    const { data } = await this.client.post(`/role-permissions/${roleId}`, { permissionId });
+    return data;
+  }
+
+  async removePermissionFromRole(roleId: number, permissionId: string) {
+    const { data } = await this.client.delete(`/role-permissions/${roleId}`, {
+      data: { permissionId }
+    });
+    return data;
+  }
+
+  // User Permissions
+  async getUserPermissions(userId: string): Promise<Permission[]> {
+    const { data } = await this.client.get(`/user-permissions/${userId}`);
+    return data.permissions;
+  }
+
+  async assignPermissionToUser(userId: string, permissionId: string) {
+    const { data } = await this.client.post(`/user-permissions/${userId}`, { permissionId });
+    return data;
+  }
+
+  async removePermissionFromUser(userId: string, permissionId: string) {
+    const { data } = await this.client.delete(`/user-permissions/${userId}`, {
+      data: { permissionId }
+    });
     return data;
   }
 }

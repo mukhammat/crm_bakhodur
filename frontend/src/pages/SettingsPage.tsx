@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../lib/api';
 import { UserRole, TaskStatus, Permission } from '../config/api';
-import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, X, Key } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<'roles' | 'statuses' | 'permissions'>('roles');
+  const [activeTab, setActiveTab] = useState<'roles' | 'statuses' | 'permissions' | 'assign'>('roles');
   
   // Roles state
   const [roles, setRoles] = useState<UserRole[]>([]);
@@ -22,10 +22,30 @@ export default function SettingsPage() {
   const [editingPermission, setEditingPermission] = useState<string | null>(null);
   const [newPermissionTitle, setNewPermissionTitle] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Assignment state
+  const [selectedRole, setSelectedRole] = useState<number | null>(null);
+  const [rolePermissions, setRolePermissions] = useState<Permission[]>([]);
 
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (selectedRole) {
+      loadRolePermissions();
+    }
+  }, [selectedRole]);
+
+  const loadRolePermissions = async () => {
+    if (!selectedRole) return;
+    try {
+      const perms = await apiClient.getRolePermissions(selectedRole);
+      setRolePermissions(perms);
+    } catch (error) {
+      toast.error('Ошибка загрузки разрешений роли');
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -155,6 +175,28 @@ export default function SettingsPage() {
     }
   };
 
+  // Permission assignment handlers
+  const handleAssignPermissionToRole = async (roleId: number, permissionId: string) => {
+    try {
+      await apiClient.assignPermissionToRole(roleId, permissionId);
+      toast.success('Разрешение добавлено к роли');
+      loadRolePermissions();
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Ошибка назначения разрешения');
+    }
+  };
+
+  const handleRemovePermissionFromRole = async (roleId: number, permissionId: string) => {
+    if (!confirm('Удалить разрешение из роли?')) return;
+    try {
+      await apiClient.removePermissionFromRole(roleId, permissionId);
+      toast.success('Разрешение удалено из роли');
+      loadRolePermissions();
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Ошибка удаления разрешения');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -202,6 +244,16 @@ export default function SettingsPage() {
             }`}
           >
             Разрешения
+          </button>
+          <button
+            onClick={() => setActiveTab('assign')}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'assign'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            Назначение разрешений
           </button>
         </nav>
       </div>
@@ -379,6 +431,93 @@ export default function SettingsPage() {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Assignment Tab */}
+      {activeTab === 'assign' && (
+        <div className="card">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Назначение разрешений ролям</h2>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Выберите роль</label>
+              <select
+                value={selectedRole || ''}
+                onChange={(e) => setSelectedRole(Number(e.target.value))}
+                className="input"
+              >
+                <option value="">Выберите роль...</option>
+                {roles.map((role) => (
+                  <option key={role.id} value={role.id}>
+                    {role.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {selectedRole && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Разрешения для роли: {roles.find(r => r.id === selectedRole)?.title}
+                </h3>
+
+                {/* Available Permissions */}
+                <div className="mb-6">
+                  <h4 className="font-medium text-gray-900 mb-3">Доступные разрешения</h4>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {permissions
+                      .filter(p => !rolePermissions.some((rp: any) => {
+                        const perm = rp.permission || rp;
+                        return perm.id === p.id;
+                      }))
+                      .map((permission) => (
+                        <div key={permission.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                          <span className="text-gray-700">{permission.title}</span>
+                          <button
+                            onClick={() => handleAssignPermissionToRole(selectedRole, permission.id)}
+                            className="btn-icon btn-icon-success"
+                          >
+                            <Plus size={18} />
+                          </button>
+                        </div>
+                      ))}
+                    {permissions.filter(p => !rolePermissions.some((rp: any) => {
+                      const perm = rp.permission || rp;
+                      return perm.id === p.id;
+                    })).length === 0 && (
+                      <p className="text-gray-500 text-sm">Все разрешения назначены</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Assigned Permissions */}
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-3">Назначенные разрешения</h4>
+                  <div className="space-y-2">
+                    {rolePermissions.length > 0 ? (
+                      rolePermissions.map((rolePerm: any) => {
+                        const perm = rolePerm.permission || rolePerm;
+                        return (
+                          <div key={rolePerm.id || perm.id} className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                            <span className="text-gray-700">{perm.title}</span>
+                            <button
+                              onClick={() => handleRemovePermissionFromRole(selectedRole!, perm.id)}
+                              className="btn-icon btn-icon-danger"
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <p className="text-gray-500 text-sm">Нет назначенных разрешений</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

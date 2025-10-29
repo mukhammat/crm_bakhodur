@@ -19,7 +19,10 @@ export class TaskController {
     
     const task = await this.taskService.create(processedData);
 
-    return c.json({ task: task }, 201);
+    // Fetch the created task with all details
+    const fullTask = await this.taskService.getById(task.id);
+
+    return c.json({ task: fullTask }, 201);
   };
 
   getById = async (c: Context) => {
@@ -41,7 +44,7 @@ export class TaskController {
     // Convert dueDate string to Date object if provided
     const processedData: any = { ...body };
     if (body.dueDate !== undefined) {
-      processedData.dueDate = body.dueDate ? new Date(body.dueDate) : null;
+      processedData.dueDate = body.dueDate !== null ? new Date(body.dueDate) : null;
     }
     
     const task = await this.taskService.update(id, processedData);

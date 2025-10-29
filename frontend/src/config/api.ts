@@ -22,6 +22,15 @@ export interface Task {
   createdAt: string;
   dueDate?: string;
   createdBy: string;
+  assignments?: Array<{
+    id: string;
+    taskId: string;
+    userId: string;
+    user?: {
+      id: string;
+      name: string;
+    };
+  }>;
 }
 
 export interface TaskStatus {
@@ -37,6 +46,20 @@ export interface UserRole {
 export interface Permission {
   id: string;
   title: string;
+}
+
+export interface UserPermission {
+  id: string;
+  userId: string;
+  permissionId: string;
+  permission?: Permission;
+}
+
+export interface RolePermission {
+  id: string;
+  roleId: number;
+  permissionId: string;
+  permission?: Permission;
 }
 
 export interface TaskAssignment {
