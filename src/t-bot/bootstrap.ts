@@ -1,5 +1,6 @@
 import db from "../database/index.js";
 import { TaskService } from "../core/services/task.service.js";
+import { TaskAssignmentService } from "../core/services/task-assignment.service.js";
 import { UserService } from "../core/services/user.service.js";
 import { TaskCallback } from './callbacks/task.callback.js'
 import { TaskCommand } from "./commands/task.command.js";
@@ -12,7 +13,11 @@ export default {
         taskCallback: new TaskCallback(new TaskService(db))
     },
     command:  {
-        taskCommand: new TaskCommand(new TaskService(db), new UserService(db)),
+        taskCommand: new TaskCommand(
+            new TaskAssignmentService(db),
+            new TaskService(db),
+            new UserService(db)
+        ),
         mainCommand: new MainCommand(),
         authCommand: new AuthCommand()
     },

@@ -6,12 +6,13 @@ export class UserController {
   constructor(private userService: IUserService) {}
 
   getAll = async (c: ContextJWT) => {
-    const { roleId } = c.get('jwtPayload');
+    const { roleId } = c.req.query()
 
-    // filter by role id
-    const params: { roleId?: RoleDto } = { roleId };
+    const users = await this.userService.getAll({
+      roleId: roleId ? Number(roleId) : undefined
+    });
 
-    const users = await this.userService.getAll(params);
+    console.log(users);
     return c.json({ users });
   }
 

@@ -1,11 +1,13 @@
 import { InlineKeyboard } from "grammy";
 import type { TaskService } from "../../core/services/task.service.js";
+import type { TaskAssignmentService } from "../../core/services/task-assignment.service.js";
 import type { UserService } from "../../core/services/user.service.js";
 import type { MyContext } from "../types/grammy.type.js";
 
 export class TaskCommand {
 
     constructor(
+        private taskAssigService: TaskAssignmentService,
         private taskService: TaskService,
         private userService: UserService
     ) {}
@@ -13,7 +15,7 @@ export class TaskCommand {
     public myTasks = async (ctx: MyContext) => {
         if(!ctx.user?.id) return;
 
-        const a = await this.taskService.getAssignmentByUserId(ctx.user?.id || '');
+        const a = await this.taskAssigService.getByUserId(ctx.user?.id || '');
         console.log(a);
 
         if(!a.length) {

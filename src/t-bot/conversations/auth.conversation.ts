@@ -17,7 +17,7 @@ export class AuthConversation {
     
         const role = await redis.get(`register_key:${key}`);
     
-        if (role !== 'worker') {
+        if (!role) {
             await ctx.reply("Неверный ключ!");
             return;
         }
