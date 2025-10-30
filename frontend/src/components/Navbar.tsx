@@ -4,20 +4,18 @@ import { LogOut, LayoutDashboard, ClipboardList, Users, Settings } from 'lucide-
 import { clsx } from 'clsx';
 
 export default function Navbar() {
-  const { user, logout } = useAuthStore();
+  const { user, permissions, logout } = useAuthStore();
   const location = useLocation();
 
+  // Определяем разрешения для каждого раздела
   const navItems = [
-    { path: '/dashboard', icon: LayoutDashboard, label: 'Панель' },
-    { path: '/tasks', icon: ClipboardList, label: 'Задачи' },
-    { path: '/users', icon: Users, label: 'Пользователи' },
+    { path: '/dashboard', icon: LayoutDashboard, label: 'Панель', permission: null },
+    { path: '/tasks', icon: ClipboardList, label: 'Задачи', permission: 'VIEW_TASKS' },
+    { path: '/users', icon: Users, label: 'Пользователи', permission: 'VIEW_USERS' },
+    { path: '/settings', icon: Settings, label: 'Настройки', permission: 'MANAGE_PERMISSIONS' },
   ];
 
-  const isAdmin = user?.roleId === 1; // Assuming ADMIN roleId is 1
-
-  if (isAdmin) {
-    navItems.push({ path: '/settings', icon: Settings, label: 'Настройки' });
-  }
+  const allowedNavItems = navItems.filter(item => !item.permission || permissions.includes(item.permission));
 
   return (
     <nav className="bg-white border-b border-gray-200 shadow-sm">
@@ -27,12 +25,11 @@ export default function Navbar() {
             <Link to="/dashboard" className="text-xl font-bold text-primary-600">
               CRM Bakhodur
             </Link>
-            
+
             <div className="flex space-x-1">
-              {navItems.map((item) => {
+              {allowedNavItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
-                
                 return (
                   <Link
                     key={item.path}

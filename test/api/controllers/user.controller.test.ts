@@ -124,11 +124,10 @@ describe('UserController', () => {
       vi.mocked(mockService.getAll).mockResolvedValue(users);
 
       app.get('/users', async (c: ContextJWT) => {
-        c.set('jwtPayload', { id: 'user-1', roleId: 2 });
         return controller.getAll(c);
       });
 
-      const res = await app.request('/users', {
+      const res = await app.request('/users?roleId=2', {
         method: 'GET',
       });
 
@@ -142,11 +141,10 @@ describe('UserController', () => {
       vi.mocked(mockService.getAll).mockResolvedValue([]);
 
       app.get('/users', async (c: ContextJWT) => {
-        c.set('jwtPayload', { id: 'user-1', roleId: 2 });
         return controller.getAll(c);
       });
 
-      const res = await app.request('/users', {
+      const res = await app.request('/users?roleId=2', {
         method: 'GET',
       });
 

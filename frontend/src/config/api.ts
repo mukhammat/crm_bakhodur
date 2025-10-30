@@ -78,8 +78,8 @@ export interface RegisterData {
   email: string;
   password: string;
   name: string;
-  roleId: number;
-  registerKey?: string;
+  key: string;
+  telegramId?: number;
 }
 
 export interface CreateTaskData {

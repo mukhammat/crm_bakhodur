@@ -6,15 +6,18 @@ import toast from 'react-hot-toast';
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  permissions: string[];
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   fetchUser: () => Promise<void>;
+  fetchPermissions: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
+  permissions: [],
   isLoading: true,
 
   login: async (email: string, password: string) => {
@@ -22,6 +25,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       await apiClient.login({ email, password });
       const user = await apiClient.getCurrentUser();
       set({ user, isAuthenticated: true, isLoading: false });
+      await useAuthStore.getState().fetchPermissions();
       toast.success('Вход выполнен успешно');
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Ошибка входа');
@@ -31,7 +35,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: () => {
     apiClient.logout();
-    set({ user: null, isAuthenticated: false, isLoading: false });
+    set({ user: null, isAuthenticated: false, isLoading: false, permissions: [] });
     toast.success('Выход выполнен');
   },
 
@@ -41,12 +45,22 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isLoading: false });
       return;
     }
-
     try {
       const user = await apiClient.getCurrentUser();
       set({ user, isAuthenticated: true, isLoading: false });
+      await useAuthStore.getState().fetchPermissions();
     } catch (error) {
-      set({ user: null, isAuthenticated: false, isLoading: false });
+      set({ user: null, isAuthenticated: false, isLoading: false, permissions: [] });
+    }
+  },
+
+  fetchPermissions: async () => {
+    try {
+      const res = await apiClient.getMyRolePermissions();
+      // res.permissions — массив объектов { permission: { title } }
+      set({ permissions: res.permissions.map((p: any) => p.permission?.title) });
+    } catch {
+      set({ permissions: [] });
     }
   },
 }));

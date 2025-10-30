@@ -9,6 +9,8 @@ import UsersPage from './pages/UsersPage';
 import SettingsPage from './pages/SettingsPage';
 import Layout from './components/Layout';
 import LoadingSpinner from './components/LoadingSpinner';
+import RegisterPage from './pages/RegisterPage';
+import RequirePermission from './components/RequirePermission';
 
 function App() {
   const { fetchUser, isLoading } = useAuthStore();
@@ -26,12 +28,25 @@ function App() {
       <Toaster position="top-right" />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="tasks" element={<TasksPage />} />
-          <Route path="users" element={<UsersPage />} />
-          <Route path="settings" element={<SettingsPage />} />
+          <Route path="tasks" element={
+            <RequirePermission permission="VIEW_TASKS">
+              <TasksPage />
+            </RequirePermission>
+          } />
+          <Route path="users" element={
+            <RequirePermission permission="VIEW_USERS">
+              <UsersPage />
+            </RequirePermission>
+          } />
+          <Route path="settings" element={
+            <RequirePermission permission="MANAGE_PERMISSIONS">
+              <SettingsPage />
+            </RequirePermission>
+          } />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

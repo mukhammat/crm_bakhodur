@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { TaskStatusController } from '../../../src/api/controllers/task-status.controller'
 import { Context } from 'hono'
-import { CustomError } from '../../../src/core/errors/custom.error'
+import { CustomError } from '../../../src/core/errors/custom.error.js'
 import type { ITaskStatusService } from '../../../src/core/services/task-status.service.js'
 import type { TaskType } from '../../../src/core/dto/task-status.dto.js'
 

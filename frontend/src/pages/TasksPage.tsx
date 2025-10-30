@@ -3,6 +3,7 @@ import { apiClient } from '../lib/api';
 import { Task, User } from '../config/api';
 import toast from 'react-hot-toast';
 import { Plus, Search, Edit, Trash2 } from 'lucide-react';
+import { useAuthStore } from '../stores/authStore';
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -12,6 +13,11 @@ export default function TasksPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const { permissions } = useAuthStore();
+
+  const canCreate = permissions.includes('CREATE_TASKS');
+  const canUpdate = permissions.includes('UPDATE_TASKS');
+  const canDelete = permissions.includes('DELETE_TASKS');
 
   useEffect(() => {
     fetchData();
@@ -35,6 +41,7 @@ export default function TasksPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!canDelete) return;
     if (!confirm('Вы уверены, что хотите удалить задачу?')) return;
 
     try {
@@ -66,16 +73,18 @@ export default function TasksPage() {
           <h1 className="text-3xl font-bold text-gray-900">Задачи</h1>
           <p className="text-gray-600 mt-2">Управление задачами</p>
         </div>
-        <button
-          onClick={() => {
-            setEditingTask(null);
-            setIsModalOpen(true);
-          }}
-          className="btn btn-primary flex items-center space-x-2"
-        >
-          <Plus size={20} />
-          <span>Новая задача</span>
-        </button>
+        {canCreate && (
+          <button
+            onClick={() => {
+              setEditingTask(null);
+              setIsModalOpen(true);
+            }}
+            className="btn btn-primary flex items-center space-x-2"
+          >
+            <Plus size={20} />
+            <span>Новая задача</span>
+          </button>
+        )}
       </div>
 
       <div className="flex items-center space-x-4">
@@ -111,7 +120,10 @@ export default function TasksPage() {
                   key={task.id}
                   task={task}
                   statuses={statuses}
+                  canUpdate={canUpdate}
+                  canDelete={canDelete}
                   onEdit={() => {
+                    if (!canUpdate) return;
                     setEditingTask(task);
                     setIsModalOpen(true);
                   }}
@@ -149,14 +161,12 @@ export default function TasksPage() {
   );
 }
 
-function TaskRow({ task, statuses, onEdit, onDelete }: { task: Task; statuses: any[]; onEdit: () => void; onDelete: () => void }) {
+function TaskRow({ task, statuses, canUpdate, canDelete, onEdit, onDelete }: { task: Task; statuses: any[]; canUpdate: boolean; canDelete: boolean; onEdit: () => void; onDelete: () => void }) {
   const getStatusBadge = (statusId: number) => {
     const status = statuses.find(s => s.id === statusId);
     if (!status) {
       return <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Неизвестно</span>;
     }
-    
-    // Определяем цвет на основе статуса
     let color = 'bg-gray-100 text-gray-800';
     if (status.title.includes('NEW') || status.title.includes('NEW')) {
       color = 'bg-yellow-100 text-yellow-800';
@@ -165,7 +175,6 @@ function TaskRow({ task, statuses, onEdit, onDelete }: { task: Task; statuses: a
     } else if (status.title.includes('COMPLETED') || status.title.includes('Выполнено')) {
       color = 'bg-green-100 text-green-800';
     }
-    
     return <span className={`px-2 py-1 rounded-full text-xs font-medium ${color}`}>{status.title}</span>;
   };
 
@@ -200,18 +209,22 @@ function TaskRow({ task, statuses, onEdit, onDelete }: { task: Task; statuses: a
       <td>{formatDate(task.createdAt)}</td>
       <td>
         <div className="flex items-center space-x-2">
-          <button
-            onClick={onEdit}
-            className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
-          >
-            <Edit size={18} />
-          </button>
-          <button
-            onClick={onDelete}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            <Trash2 size={18} />
-          </button>
+          {canUpdate && (
+            <button
+              onClick={onEdit}
+              className="p-2 text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+            >
+              <Edit size={18} />
+            </button>
+          )}
+          {canDelete && (
+            <button
+              onClick={onDelete}
+              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <Trash2 size={18} />
+            </button>
+          )}
         </div>
       </td>
     </tr>

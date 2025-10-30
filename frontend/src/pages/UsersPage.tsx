@@ -3,6 +3,7 @@ import { apiClient } from '../lib/api';
 import { User } from '../config/api';
 import toast from 'react-hot-toast';
 import { Search, Edit, Trash2, Key } from 'lucide-react';
+import { useAuthStore } from '../stores/authStore';
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
@@ -11,6 +12,10 @@ export default function UsersPage() {
   const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
   const [generatedKey, setGeneratedKey] = useState('');
   const [selectedRole, setSelectedRole] = useState<'MANAGER' | 'WORKER'>('MANAGER');
+  const { permissions } = useAuthStore();
+
+  const canDeleteUsers = permissions.includes('DELETE_USERS');
+  const canGenerateKeys = permissions.includes('MANAGE_PERMISSIONS');
 
   useEffect(() => {
     fetchUsers();
@@ -28,6 +33,7 @@ export default function UsersPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!canDeleteUsers) return;
     if (!confirm('Вы уверены, что хотите удалить пользователя?')) return;
 
     try {
@@ -40,6 +46,7 @@ export default function UsersPage() {
   };
 
   const handleGenerateKey = async () => {
+    if (!canGenerateKeys) return;
     try {
       const key = await apiClient.generateKey(selectedRole);
       setGeneratedKey(key);
@@ -87,10 +94,12 @@ export default function UsersPage() {
             <option value="MANAGER">Менеджер</option>
             <option value="WORKER">Работник</option>
           </select>
-          <button onClick={handleGenerateKey} className="btn btn-primary flex items-center space-x-2">
-            <Key size={20} />
-            <span>Сгенерировать ключ</span>
-          </button>
+          {canGenerateKeys && (
+            <button onClick={handleGenerateKey} className="btn btn-primary flex items-center space-x-2">
+              <Key size={20} />
+              <span>Сгенерировать ключ</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -138,12 +147,14 @@ export default function UsersPage() {
                   </td>
                   <td>
                     <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <Trash2 size={18} />
-                      </button>
+                      {canDeleteUsers && (
+                        <button
+                          onClick={() => handleDelete(user.id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

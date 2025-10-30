@@ -1,28 +1,29 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { PermissionController } from '../../../src/api/controllers/permission.controller'
-import { Context } from 'hono'
+import { PermissionController } from '../../../src/api/controllers/permission.controller.js'
+import { Context, Hono, ContextRenderer, ContextVariableMap } from 'hono'
+import { IPermissionService } from '../../../src/core/services/permission.service.js'
+
+const createMockService = (): IPermissionService => ({
+  create: vi.fn(),
+  getById: vi.fn(),
+  getAll: vi.fn(),
+  update: vi.fn(),
+  delete: vi.fn(),
+  getByTitle: vi.fn()
+})
+
+
 
 describe('PermissionController', () => {
-  let permissionService: any
+  let app: Hono;
+  let mockService: IPermissionService;
   let controller: PermissionController
-  let mockContext: Partial<Context>
+  
 
   beforeEach(() => {
-    permissionService = {
-      create: vi.fn(),
-      getById: vi.fn(),
-      getAll: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn()
-    }
-    controller = new PermissionController(permissionService)
-    mockContext: Partial<Context> = {
-      json: vi.fn(),
-      req: {
-        json: vi.fn(),
-        param: vi.fn()
-      }
-    }
+    app = new Hono();
+    mockService = createMockService();
+    controller = new PermissionController(mockService);
   })
 
   describe('create', () => {
@@ -30,47 +31,63 @@ describe('PermissionController', () => {
       const permissionData = { name: 'NEW_PERMISSION', description: 'New permission' }
       const createdPermission = { id: '1', ...permissionData }
       
-      vi.mocked(mockContext.req!.json).mockResolvedValue(permissionData)
-      vi.mocked(permissionService.create).mockResolvedValue(createdPermission)
-      vi.mocked(mockContext.json!).mockReturnValue(undefined as any)
+      vi.mocked(mockService.create).mockResolvedValue(createdPermission);
 
-      await controller.create(mockContext as Context)
+      app.post('/', async (c: Context) => {
+        return controller.create(c);
+      });
 
-      expect(permissionService.create).toHaveBeenCalledWith(permissionData)
-      expect(mockContext.json).toHaveBeenCalledWith({ permission: createdPermission }, 201)
+      const res = await app.request('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(permissionData),
+      });
+
+      expect(res.status).toBe(201);
+      const data = await res.json();
+      expect(data).toEqual({permission: createdPermission});
     })
   })
 
   describe('getAll', () => {
     it('should return all permissions', async () => {
       const permissions = [
-        { id: '1', name: 'PERMISSION_1', description: 'First permission' },
-        { id: '2', name: 'PERMISSION_2', description: 'Second permission' }
+        { id: '1', title: 'PERMISSION_1' },
+        { id: '2', title: 'PERMISSION_2' }
       ]
 
-      vi.mocked(permissionService.getAll).mockResolvedValue(permissions)
-      vi.mocked(mockContext.json).mockReturnValue(undefined as any)
+      vi.mocked(mockService.getAll).mockResolvedValue(permissions)
 
-      await controller.getAll(mockContext as Context)
+      app.get('/', async (c) => {
+        return controller.getAll(c);
+      })
 
-      expect(permissionService.getAll).toHaveBeenCalled()
-      expect(mockContext.json).toHaveBeenCalledWith({ permissions })
+      const res = await app.request('/');
+
+
+
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data).toEqual({ permissions });
     })
   })
 
   describe('getById', () => {
     it('should return permission by id when found', async () => {
-      const permission = { id: '1', name: 'TEST_PERMISSION', description: 'Test permission' }
+      const permission = { id: '1', title: 'TEST_PERMISSION' }
       const id = '1'
 
-      vi.mocked(mockContext.req.param).mockReturnValue(id)
-      vi.mocked(permissionService.getById).mockResolvedValue(permission)
-      vi.mocked(mockContext.json).mockReturnValue(undefined as any)
+      vi.mocked(mockService.getById).mockResolvedValue(permission)
 
-      await controller.getById(mockContext as Context)
+      app.get('/id', async (c) => {
+        return controller.getById(c)
+      })
 
-      expect(permissionService.getById).toHaveBeenCalledWith(id)
-      expect(mockContext.json).toHaveBeenCalledWith({ permission })
+      const res = await app.request(`/${id}`);
+
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data).toEqual({  });
     })
 
     it('should return 404 when permission not found', async () => {

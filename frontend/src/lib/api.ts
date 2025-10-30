@@ -224,6 +224,12 @@ class ApiClient {
     });
     return data;
   }
+
+  // User Permissions (for current user via role)
+  async getMyRolePermissions() {
+    const { data } = await this.client.get('/role-permissions/me');
+    return data;
+  }
 }
 
 export const apiClient = new ApiClient();

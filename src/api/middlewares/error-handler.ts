@@ -5,7 +5,7 @@ export const errorHandler: ErrorHandler = (err, c) => {
   let message = 'Internal Server Error';
   let status = 500;
 
-  console.log(err);
+  //console.log(err);
 
   if (err instanceof CustomError) {
     message = err.message;
