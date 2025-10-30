@@ -224,24 +224,6 @@ class ApiClient {
     });
     return data;
   }
-
-  // User Permissions
-  async getUserPermissions(userId: string): Promise<Permission[]> {
-    const { data } = await this.client.get(`/user-permissions/${userId}`);
-    return data.permissions;
-  }
-
-  async assignPermissionToUser(userId: string, permissionId: string) {
-    const { data } = await this.client.post(`/user-permissions/${userId}`, { permissionId });
-    return data;
-  }
-
-  async removePermissionFromUser(userId: string, permissionId: string) {
-    const { data } = await this.client.delete(`/user-permissions/${userId}`, {
-      data: { permissionId }
-    });
-    return data;
-  }
 }
 
 export const apiClient = new ApiClient();
