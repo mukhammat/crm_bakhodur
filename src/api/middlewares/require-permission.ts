@@ -13,7 +13,6 @@ export const requirePermission = (permissions: AllowedPermission[]) => {
       return c.json({ message: 'Нет доступа!' }, 403)
     }
 
-    const userId = payload.id;
     const userRoleId = payload.roleId;
 
     // Get all permission titles from role (rolePermissions)
@@ -24,24 +23,14 @@ export const requirePermission = (permissions: AllowedPermission[]) => {
       }
     });
 
-    // Get all permission titles from user-specific permissions (userPermissions)
-    const userPerms = await db.query.userPermissions.findMany({
-      where: eq(schema.userPermissions.userId, userId),
-      with: {
-        permission: true
-      }
-    });
-
     // Extract permission titles
     const rolePermissionTitles = rolePerms.map(rp => rp.permission.title);
-    const userPermissionTitles = userPerms.map(up => up.permission.title);
     
     // Combine all available permissions
-    const allUserPermissions = [...rolePermissionTitles, ...userPermissionTitles];
 
     // Check if user has at least one of the required permissions
     const hasAccess = permissions.some(permission => 
-      allUserPermissions.includes(permission)
+      rolePermissionTitles.includes(permission)
     );
 
     if (!hasAccess) {

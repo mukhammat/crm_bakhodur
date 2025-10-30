@@ -4,7 +4,6 @@ import { schema } from "../../database/index.js";
 import type { InferResultType } from "../../database/index.js";
 
 export type RolePermissionType = InferResultType<'rolePermissions'>;
-export type UserPermissionType = InferResultType<'userPermissions'>;
 
 export interface IRolePermissionService {
   getByRoleId(roleId: number): Promise<RolePermissionType[]>;

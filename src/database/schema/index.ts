@@ -28,7 +28,7 @@ export const tasks = table("tasks", {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
   title: t.varchar().notNull(),
   description: t.text('description').notNull(),
-  statusId: t.serial('status_id').default(1)
+  statusId: t.serial('status_id')
   //.notNull()
   .references(() => taskStatuses.id),
   createdAt: t.timestamp('created_at').notNull().defaultNow(),
@@ -50,14 +50,6 @@ export const permissions = table('permissions', {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
   title: t.varchar().notNull().unique(),
 })
-
-export const userPermissions = table('user_permissions', {
-  id: t.uuid().primaryKey().notNull().defaultRandom(),
-  userId: t.uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  permissionId: t.uuid('permission_id').notNull().references(() => permissions.id, { onDelete: 'cascade' })
-}, (table) => ({
-  uniq: t.unique().on(table.permissionId, table.userId)
-}))
 
 export const rolePermissions = table('role_permissions', {
   id: t.uuid().primaryKey().notNull().defaultRandom(),
@@ -103,7 +95,6 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     fields: [users.roleId],
     references: [userRoles.id],
   }),
-  userPermissions: many(userPermissions)
 }));
 
 export const taskStatusesRelations = relations(taskStatuses, ({ many }) => ({
@@ -123,19 +114,7 @@ export const tasksRelations = relations(tasks, ({ many, one }) => ({
 }))
 
 export const permissionsRelations = relations(permissions, ({ many }) => ({
-  userPermissions: many(userPermissions),
   rolePermissions: many(rolePermissions)
-}))
-
-export const userPermissionsRelations = relations(userPermissions, ({ one }) => ({
-  user: one(users, {
-    fields: [userPermissions.userId],
-    references: [users.id]
-  }),
-  permission: one(permissions, {
-    fields: [userPermissions.permissionId],
-    references: [permissions.id]
-  })
 }))
 
 export const rolePermissionsRelations = relations(rolePermissions, ({ one }) => ({

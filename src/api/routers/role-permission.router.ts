@@ -11,6 +11,7 @@ export const rolePermissionRouter = (db: DrizzleClient) => {
   return new Hono()
     .use(requireAuth)
     .use(requirePermission(['MANAGE_PERMISSIONS']))
+    .get('/me', controller.me)
     .get('/:roleId', controller.getByRoleId)
     .post('/:roleId', controller.assignPermission)
     .delete('/:roleId', controller.removePermission);

@@ -19,10 +19,7 @@ export class TaskController {
     
     const task = await this.taskService.create(processedData);
 
-    // Fetch the created task with all details
-    const fullTask = await this.taskService.getById(task.id);
-    eventBus.emit('task.created', { taskId: task.id, userId: id });
-    return c.json({ task: fullTask }, 201);
+    return c.json({ task }, 201);
   };
 
   getById = async (c: Context) => {

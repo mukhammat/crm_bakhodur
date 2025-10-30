@@ -11,10 +11,6 @@ const createMockService = (): ITaskService => ({
   getAll: vi.fn(),
   update: vi.fn(),
   delete: vi.fn(),
-  assignTaskToUser: vi.fn(),
-  unassignTaskFromUser: vi.fn(),
-  getAssignmentLengthByUserId: vi.fn(),
-  getAssignmentByUserId: vi.fn(),
 });
 
 describe('TaskController', () => {
@@ -267,60 +263,6 @@ describe('TaskController', () => {
       });
       expect(data.task.createdAt).toBeDefined();
       expect(mockService.delete).toHaveBeenCalledWith('task-1');
-    });
-  });
-
-  describe('POST /tasks/assign - assignTaskToUser', () => {
-    it('должен назначить задачу пользователю', async () => {
-      const assignment = { id: 'assignment-1', taskId: 'task-1', userId: 'user-1' };
-      vi.mocked(mockService.assignTaskToUser).mockResolvedValue(assignment);
-
-      app.post('/tasks/assign', (c) => controller.assignTaskToUser(c));
-
-      const res = await app.request('/tasks/assign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ taskId: 'task-1', userId: 'user-1' }),
-      });
-
-      expect(res.status).toBe(200);
-      const data = await res.json();
-      expect(data).toEqual({ taskAssignment: assignment });
-      expect(mockService.assignTaskToUser).toHaveBeenCalledWith('task-1', 'user-1');
-    });
-  });
-
-  describe('DELETE /assignments/:id - unassignTaskFromUser', () => {
-    it('должен отменить назначение задачи', async () => {
-      const assignment = { id: 'assignment-1' };
-      vi.mocked(mockService.unassignTaskFromUser).mockResolvedValue(assignment);
-
-      app.delete('/assignments/:id', (c) => controller.unassignTaskFromUser(c));
-
-      const res = await app.request('/assignments/assignment-1', {
-        method: 'DELETE',
-      });
-
-      expect(res.status).toBe(200);
-      const data = await res.json();
-      expect(data).toEqual({ taskAssignment: assignment });
-      expect(mockService.unassignTaskFromUser).toHaveBeenCalledWith('assignment-1');
-    });
-  });
-
-  describe('GET /users/:id/assignments - getAssignmentLengthByUserId', () => {
-    it('должен вернуть количество назначений пользователя', async () => {
-      const assignmentLength = [{ count: 5, status: 'active' }];
-      vi.mocked(mockService.getAssignmentLengthByUserId).mockResolvedValue(assignmentLength);
-
-      app.get('/users/:id/assignments', (c) => controller.getAssignmentLengthByUserId(c));
-
-      const res = await app.request('/users/user-1/assignments');
-
-      expect(res.status).toBe(200);
-      const data = await res.json();
-      expect(data).toEqual({ rows: assignmentLength });
-      expect(mockService.getAssignmentLengthByUserId).toHaveBeenCalledWith('user-1');
     });
   });
 });

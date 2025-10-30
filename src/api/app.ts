@@ -17,7 +17,6 @@ import { userRouter } from "./routers/user.router.js";
 import { userRoleRouter } from "./routers/user-role.router.js";
 import { permissionRouter } from "./routers/permission.router.js";
 import { rolePermissionRouter } from "./routers/role-permission.router.js";
-import { userPermissionRouter } from "./routers/user-permission.router.js";
 
 app
 .route('/auth', authRouter(db))
@@ -28,7 +27,6 @@ app
 .route("/user-roles", userRoleRouter(db))
 .route("/permissions", permissionRouter(db))
 .route("/role-permissions", rolePermissionRouter(db))
-.route("/user-permissions", userPermissionRouter(db))
 
 // Global handlers
 import { errorHandler } from './middlewares/error-handler.js'

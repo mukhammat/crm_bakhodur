@@ -1,9 +1,17 @@
 import type { Context } from 'hono';
 import type { IRolePermissionService } from '../../core/services/role-permission.service.js';
 import { CustomError } from '../../core/errors/custom.error.js';
+import type { ContextJWT } from '../types/context-jwt.js';
 
 export class RolePermissionController {
   constructor(private rolePermissionService: IRolePermissionService) {}
+
+  me = async (c: ContextJWT) => {
+    const { roleId } = c.get('jwtPayload')
+
+    const permissions = await this.rolePermissionService.getByRoleId(roleId);
+    return c.json({ permissions });
+  }
 
   getByRoleId = async (c: Context) => {
     const roleId = parseInt(c.req.param('roleId'));
