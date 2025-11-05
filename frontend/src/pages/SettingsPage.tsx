@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { apiClient } from '../lib/api';
 import { UserRole, TaskStatus, Permission } from '../config/api';
-import { Plus, Edit2, Trash2, Save, X, Key } from 'lucide-react';
+import { Plus, Edit2, Trash2, Save, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function SettingsPage() {

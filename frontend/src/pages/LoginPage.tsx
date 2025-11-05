@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import toast from 'react-hot-toast';
 import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {

@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { apiClient } from '../lib/api';
 import { User, UserRole } from '../config/api';
 import toast from 'react-hot-toast';
-import { Search, Edit, Trash2, Key } from 'lucide-react';
+import { Search, Trash2, Key } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 
 export default function UsersPage() {
