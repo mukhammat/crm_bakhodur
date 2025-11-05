@@ -8,7 +8,13 @@ type TaskWithAssignmentsForReminders = InferResultType<
   {
     assignments: {
       with: {
-        user: true;
+        user: {
+          columns: {
+            id: true;
+            telegramId: true;
+            name: true;
+          };
+        };
       };
     };
   }
