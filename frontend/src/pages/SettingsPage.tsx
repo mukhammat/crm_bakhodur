@@ -68,10 +68,13 @@ export default function SettingsPage() {
   const handleCreateRole = async () => {
     if (!newRoleTitle.trim()) return;
     try {
-      const role = await apiClient.createUserRole(newRoleTitle);
-      setRoles([...roles, role]);
+      await apiClient.createUserRole(newRoleTitle);
       setNewRoleTitle('');
+      // Перезагружаем все роли с сервера для синхронизации
+      const rolesData = await apiClient.getUserRoles();
+      setRoles(rolesData);
       toast.success('Роль создана');
+      window.dispatchEvent(new CustomEvent('rolesUpdated'));
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Ошибка создания роли');
     }
@@ -84,7 +87,11 @@ export default function SettingsPage() {
     try {
       await apiClient.updateUserRole(id, role.title);
       setEditingRole(null);
+      // Перезагружаем все роли с сервера для синхронизации
+      const rolesData = await apiClient.getUserRoles();
+      setRoles(rolesData);
       toast.success('Роль обновлена');
+      window.dispatchEvent(new CustomEvent('rolesUpdated'));
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Ошибка обновления роли');
     }
@@ -94,8 +101,11 @@ export default function SettingsPage() {
     if (!confirm('Удалить роль?')) return;
     try {
       await apiClient.deleteUserRole(id);
-      setRoles(roles.filter(r => r.id !== id));
+      // Перезагружаем все роли с сервера для синхронизации
+      const rolesData = await apiClient.getUserRoles();
+      setRoles(rolesData);
       toast.success('Роль удалена');
+      window.dispatchEvent(new CustomEvent('rolesUpdated'));
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Ошибка удаления роли');
     }
@@ -105,10 +115,12 @@ export default function SettingsPage() {
   const handleCreateStatus = async () => {
     if (!newStatusTitle.trim()) return;
     try {
-      const status = await apiClient.createTaskStatus(newStatusTitle);
-      setStatuses([...statuses, status]);
+      await apiClient.createTaskStatus(newStatusTitle);
       setNewStatusTitle('');
+      const statusesData = await apiClient.getTaskStatuses();
+      setStatuses(statusesData);
       toast.success('Статус создан');
+      window.dispatchEvent(new CustomEvent('statusesUpdated'));
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Ошибка создания статуса');
     }
@@ -121,7 +133,10 @@ export default function SettingsPage() {
     try {
       await apiClient.updateTaskStatus(id, status.title);
       setEditingStatus(null);
+      const statusesData = await apiClient.getTaskStatuses();
+      setStatuses(statusesData);
       toast.success('Статус обновлен');
+      window.dispatchEvent(new CustomEvent('statusesUpdated'));
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Ошибка обновления статуса');
     }
@@ -131,8 +146,10 @@ export default function SettingsPage() {
     if (!confirm('Удалить статус?')) return;
     try {
       await apiClient.deleteTaskStatus(id);
-      setStatuses(statuses.filter(s => s.id !== id));
+      const statusesData = await apiClient.getTaskStatuses();
+      setStatuses(statusesData);
       toast.success('Статус удален');
+      window.dispatchEvent(new CustomEvent('statusesUpdated'));
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Ошибка удаления статуса');
     }

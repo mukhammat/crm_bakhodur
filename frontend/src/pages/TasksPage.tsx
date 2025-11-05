@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { apiClient } from '../lib/api';
 import { Task, User } from '../config/api';
 import toast from 'react-hot-toast';
@@ -14,13 +15,19 @@ export default function TasksPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const { permissions } = useAuthStore();
+  const location = useLocation();
 
   const canCreate = permissions.includes('CREATE_TASKS');
   const canUpdate = permissions.includes('UPDATE_TASKS');
   const canDelete = permissions.includes('DELETE_TASKS');
 
-  useEffect(() => {
-    fetchData();
+  const fetchStatuses = useCallback(async () => {
+    try {
+      const statusesData = await apiClient.getTaskStatuses();
+      setStatuses(statusesData);
+    } catch (error) {
+      // Ошибка обрабатывается автоматически
+    }
   }, []);
 
   const fetchData = async () => {
@@ -39,6 +46,26 @@ export default function TasksPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+
+    const handleStatusesUpdated = () => {
+      fetchStatuses();
+    };
+    window.addEventListener('statusesUpdated', handleStatusesUpdated);
+    
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible' && location.pathname === '/tasks') {
+        fetchStatuses();
+      }
+    }, 3000);
+
+    return () => {
+      window.removeEventListener('statusesUpdated', handleStatusesUpdated);
+      clearInterval(interval);
+    };
+  }, [fetchStatuses, location.pathname]);
 
   const handleDelete = async (id: string) => {
     if (!canDelete) return;

@@ -1,25 +1,80 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import { apiClient } from '../lib/api';
-import { User } from '../config/api';
+import { User, UserRole } from '../config/api';
 import toast from 'react-hot-toast';
 import { Search, Edit, Trash2, Key } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 
 export default function UsersPage() {
   const [users, setUsers] = useState<User[]>([]);
+  const [roles, setRoles] = useState<UserRole[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isKeyModalOpen, setIsKeyModalOpen] = useState(false);
   const [generatedKey, setGeneratedKey] = useState('');
-  const [selectedRole, setSelectedRole] = useState<'MANAGER' | 'WORKER'>('MANAGER');
+  const [selectedRole, setSelectedRole] = useState<string>('');
   const { permissions } = useAuthStore();
+  const location = useLocation();
 
   const canDeleteUsers = permissions.includes('DELETE_USERS');
   const canGenerateKeys = permissions.includes('MANAGE_PERMISSIONS');
 
+  // Фильтруем роли: исключаем ADMIN (обычно id=1 или title содержит ADMIN)
+  const availableRoles = roles.filter(role => 
+    role.id !== 1 && !role.title.toUpperCase().includes('ADMIN')
+  );
+
+  const fetchRoles = useCallback(async () => {
+    try {
+      const rolesData = await apiClient.getUserRoles();
+      // Всегда обновляем список ролей
+      setRoles(rolesData);
+      
+      // Обновляем выбранную роль, если нужно
+      const nonAdminRoles = rolesData.filter(r => r.id !== 1 && !r.title.toUpperCase().includes('ADMIN'));
+      if (nonAdminRoles.length > 0) {
+        setSelectedRole(prev => {
+          // Если текущая роль существует в новом списке, оставляем её
+          const currentRoleExists = nonAdminRoles.some(r => r.title === prev);
+          if (currentRoleExists && prev) {
+            return prev;
+          }
+          // Иначе выбираем первую доступную
+          return nonAdminRoles[0].title;
+        });
+      } else {
+        // Если нет доступных ролей, сбрасываем выбор
+        setSelectedRole('');
+      }
+    } catch (error) {
+      // Ошибка загрузки ролей обрабатывается автоматически
+    }
+  }, []);
+
   useEffect(() => {
     fetchUsers();
-  }, []);
+    fetchRoles();
+
+    // Обновляем роли при кастомном событии (когда роль создана/удалена/обновлена в настройках)
+    const handleRolesUpdated = () => {
+      fetchRoles();
+    };
+    window.addEventListener('rolesUpdated', handleRolesUpdated);
+    
+    // Периодическое обновление ролей (каждые 3 секунды), если страница видима
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible' && location.pathname === '/users') {
+        fetchRoles();
+      }
+    }, 3000);
+
+    return () => {
+      window.removeEventListener('rolesUpdated', handleRolesUpdated);
+      clearInterval(interval);
+    };
+  }, [fetchRoles, location.pathname]);
+
 
   const fetchUsers = async () => {
     try {
@@ -46,7 +101,7 @@ export default function UsersPage() {
   };
 
   const handleGenerateKey = async () => {
-    if (!canGenerateKeys) return;
+    if (!canGenerateKeys || !selectedRole) return;
     try {
       const key = await apiClient.generateKey(selectedRole);
       setGeneratedKey(key);
@@ -88,13 +143,21 @@ export default function UsersPage() {
         <div className="flex items-center space-x-3">
           <select
             value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value as 'MANAGER' | 'WORKER')}
+            onChange={(e) => setSelectedRole(e.target.value)}
             className="input w-auto"
+            disabled={!canGenerateKeys || availableRoles.length === 0}
           >
-            <option value="MANAGER">Менеджер</option>
-            <option value="WORKER">Работник</option>
+            {availableRoles.length === 0 ? (
+              <option value="">Нет доступных ролей</option>
+            ) : (
+              availableRoles.map((role) => (
+                <option key={role.id} value={role.title}>
+                  {role.title}
+                </option>
+              ))
+            )}
           </select>
-          {canGenerateKeys && (
+          {canGenerateKeys && selectedRole && (
             <button onClick={handleGenerateKey} className="btn btn-primary flex items-center space-x-2">
               <Key size={20} />
               <span>Сгенерировать ключ</span>

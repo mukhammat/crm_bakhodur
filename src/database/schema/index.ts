@@ -59,13 +59,13 @@ export const rolePermissions = table('role_permissions', {
   uniq: t.unique().on(table.permissionId, table.roleId)
 }))
 
-// export const notifications = table('notifications', {
-//   id: t.uuid().primaryKey().notNull().defaultRandom(),
-//   userId: t.uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-//   message: t.text().notNull(),
-//   isRead: t.boolean('is_read').notNull().default(false),
-//   createdAt: t.timestamp('created_at').notNull().defaultNow(),
-// });
+export const notifications = table('notifications', {
+  id: t.uuid().primaryKey().notNull().defaultRandom(),
+  userId: t.uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  // message: t.text().notNull(),
+  // isRead: t.boolean('is_read').notNull().default(false),
+  createdAt: t.timestamp('created_at').notNull().defaultNow(),
+});
 
 // *
 // *
@@ -127,3 +127,10 @@ export const rolePermissionsRelations = relations(rolePermissions, ({ one }) => 
     references: [permissions.id]
   })
 }))
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id]
+  }),
+}));

@@ -1,7 +1,18 @@
-import { and, eq, sql } from "drizzle-orm";
-import { taskAssignments, tasks, taskStatuses, type DrizzleClient } from "../../database/index.js";
+import { and, eq, sql, isNotNull, ne } from "drizzle-orm";
+import { taskAssignments, tasks, taskStatuses, type DrizzleClient, type InferResultType } from "../../database/index.js";
 import { CustomError } from "../errors/custom.error.js";
 import type { CreateDto, ParamsType, UpdateDto, AssignmentLength, Assignment, TaskType } from "../dto/task.dto.js";
+
+type TaskWithAssignmentsForReminders = InferResultType<
+  'tasks',
+  {
+    assignments: {
+      with: {
+        user: true;
+      };
+    };
+  }
+>;
 
 export interface ITaskService {
   create(data: CreateDto): Promise<Pick<TaskType, 'id'>>;
@@ -9,6 +20,7 @@ export interface ITaskService {
   getAll(params?: ParamsType): Promise<TaskType[]>;
   update( id: string, data: UpdateDto ): Promise<Pick<TaskType, "id">>;
   delete(id: string): Promise<Pick<TaskType, "id">>;
+  getTasksForReminders(): Promise<TaskWithAssignmentsForReminders[]>;
 }
 
 export class TaskService implements ITaskService {
@@ -123,5 +135,31 @@ export class TaskService implements ITaskService {
     }
 
     return deleted[0];
+  }
+
+  /**
+   * Получает задачи с dueDate для отправки напоминаний
+   * Возвращает задачи, которые не выполнены (statusId !== 3) и имеют назначения
+   */
+  public async getTasksForReminders(): Promise<TaskWithAssignmentsForReminders[]> {
+    return this.db.query.tasks.findMany({
+      where: and(
+        isNotNull(tasks.dueDate),
+        ne(tasks.statusId, 3) // 3 - выполнено
+      ),
+      with: {
+        assignments: {
+          with: {
+            user: {
+              columns: {
+                id: true,
+                telegramId: true,
+                name: true,
+              }
+            }
+          }
+        }
+      }
+    });
   }
 }

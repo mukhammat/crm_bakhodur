@@ -9,8 +9,7 @@ import { CreateSchema, UpdateSchema } from '../../core/schemas/task.schema.js'
 
 // Note: Task assignment endpoints have been moved to task-assignment.router.ts
 
-export const taskRouter = (db: DrizzleClient) => {
-  const taskController = new TaskController(new TaskService(db));
+export const taskRouter = (taskController: TaskController) => {
 
   return new Hono()
     .use(requireAuth)
