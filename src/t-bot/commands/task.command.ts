@@ -13,122 +13,133 @@ export class TaskCommand {
     ) {}
     
     public myTasks = async (ctx: MyContext) => {
-        if(!ctx.user?.id) return;
+        try {
+            if(!ctx.user?.id) return;
 
-        const a = await this.taskAssigService.getByUserId(ctx.user?.id || '');
-        console.log(a);
+            const assignments = await this.taskAssigService.getByUserId(ctx.user.id);
 
-        if(!a.length) {
-            await ctx.reply('Нет заданий')
-            return;
-        }
-        
-        let c = 0;
-        a.map(async (v) => {
-            const inline = new InlineKeyboard()
+            if(!assignments.length) {
+                await ctx.reply('Нет заданий')
+                return;
+            }
             
-            c++;
-            const task = v.task;
-            let message = `Задание №${c}\n${task.title}\n${task.description}\n`;
+            let counter = 0;
+            for (const assignment of assignments) {
+                const inline = new InlineKeyboard()
+                
+                counter++;
+                const task = assignment.task;
+                let message = `Задание №${counter}\n${task.title}\n${task.description}\n`;
 
-            if(v.task.statusId === 2) {
-                inline.text('Закончить', `complete:${v.taskId}`)
+                if(task.statusId === 2) {
+                    inline.text('Закончить', `complete:${assignment.taskId}`)
+                }
+
+                if(task.statusId === 1) {
+                    inline.text('Приступить', `take:${assignment.taskId}`)
+                }
+
+                if(task.statusId === 3) {
+                    message = message + '\n✅ Выполнено'
+                }
+
+                await ctx.reply(message, {reply_markup: inline})
             }
-
-            if(v.task.statusId === 1) {
-                inline.text('Приступить', `take:${v.taskId}`)
-            }
-
-            if(v.task.statusId === 3) {
-                message = message + '\n✅ Выполнено'
-            }
-
-            await ctx.reply(message, {reply_markup: inline})
-        })
+        } catch(error) {
+            console.error('Error in myTasks:', error);
+            await ctx.reply('Произошла ошибка при получении задач');
+        }
     }
 
     public getCompletedTasks = async (ctx: MyContext) => {
-        if(!ctx.user?.id) return;
+        try {
+            if(!ctx.user?.id) return;
 
-        const tasks = await this.taskService.getAll({
-            statusId: 3
-        })
+            const tasks = await this.taskService.getAll({
+                statusId: 3
+            })
 
-        let c = 0;
-        tasks.map(async (v) => {
-            const inline = new InlineKeyboard()
-            
-            c++;
-            const task = v;
-            let message = `Задание №${c}\n${task.title}\n${task.description}\n`;
-
-            if(v.statusId === 3) {
-                message = message + '\n✅ Выполнено'
+            if(!tasks.length) {
+                await ctx.reply('Нет выполненных задач');
+                return;
             }
 
-            await ctx.reply(message, {reply_markup: inline})
-        })
+            let counter = 0;
+            for (const task of tasks) {
+                const inline = new InlineKeyboard()
+                
+                counter++;
+                let message = `Задание №${counter}\n${task.title}\n${task.description}\n✅ Выполнено`;
+
+                await ctx.reply(message, {reply_markup: inline})
+            }
+        } catch(error) {
+            console.error('Error in getCompletedTasks:', error);
+            await ctx.reply('Произошла ошибка при получении выполненных задач');
+        }
     }
 
     public getPendingTasks = async (ctx: MyContext) => {
-        if(!ctx.user?.id) return;
+        try {
+            if(!ctx.user?.id) return;
 
-        const tasks = await this.taskService.getAll({
-            statusId: 1
-        })
+            const tasks = await this.taskService.getAll({
+                statusId: 1
+            })
 
-        let c = 0;
-        tasks.map(async (v) => {
-            const inline = new InlineKeyboard()
-            
-            c++;
-            const task = v;
-            let message = `Задание №${c}\n${task.title}\n${task.description}\n`;
-
-            if(v.statusId === 2) {
-                inline.text('Закончить', `complete:${v.id}`)
+            if(!tasks.length) {
+                await ctx.reply('Нет задач в ожидании');
+                return;
             }
 
-            if(v.statusId === 1) {
-                inline.text('Приступить', `take:${v.id}`)
-            }
+            let counter = 0;
+            for (const task of tasks) {
+                const inline = new InlineKeyboard()
+                
+                counter++;
+                let message = `Задание №${counter}\n${task.title}\n${task.description}\n`;
 
-            if(v.statusId === 3) {
-                message = message + '\n✅ Выполнено'
-            }
+                if(task.statusId === 1) {
+                    inline.text('Приступить', `take:${task.id}`)
+                }
 
-            await ctx.reply(message, {reply_markup: inline})
-        })
+                await ctx.reply(message, {reply_markup: inline})
+            }
+        } catch(error) {
+            console.error('Error in getPendingTasks:', error);
+            await ctx.reply('Произошла ошибка при получении задач в ожидании');
+        }
     }
 
     public getInPorgressTasks = async (ctx: MyContext) => {
-        if(!ctx.user?.id) return;
+        try {
+            if(!ctx.user?.id) return;
 
-        const tasks = await this.taskService.getAll({
-            statusId: 2
-        })
+            const tasks = await this.taskService.getAll({
+                statusId: 2
+            })
 
-        let c = 0;
-        tasks.map(async (v) => {
-            const inline = new InlineKeyboard()
-            
-            c++;
-            const task = v;
-            let message = `Задание №${c}\n${task.title}\n${task.description}\n`;
-
-            if(v.statusId === 2) {
-                inline.text('Закончить', `complete:${v.id}`)
+            if(!tasks.length) {
+                await ctx.reply('Нет задач в процессе выполнения');
+                return;
             }
 
-            if(v.statusId === 1) {
-                inline.text('Приступить', `take:${v.id}`)
-            }
+            let counter = 0;
+            for (const task of tasks) {
+                const inline = new InlineKeyboard()
+                
+                counter++;
+                let message = `Задание №${counter}\n${task.title}\n${task.description}\n`;
 
-            if(v.statusId === 3) {
-                message = message + '\n✅ Выполнено'
-            }
+                if(task.statusId === 2) {
+                    inline.text('Закончить', `complete:${task.id}`)
+                }
 
-            await ctx.reply(message, {reply_markup: inline})
-        })
+                await ctx.reply(message, {reply_markup: inline})
+            }
+        } catch(error) {
+            console.error('Error in getInPorgressTasks:', error);
+            await ctx.reply('Произошла ошибка при получении задач в процессе');
+        }
     }
 }

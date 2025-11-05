@@ -42,7 +42,7 @@ export class AuthService implements IAuthService {
 
         if (!isPasswordValid) {
             throw new CustomError(
-                'еправильные данные!'
+                'Неправильные данные!'
             );
         }
 

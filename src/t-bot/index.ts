@@ -5,15 +5,15 @@ import {
 } from "@grammyjs/conversations";
 import type { MyBot } from "./types/grammy.type.js";
 import { notificationEvents } from './events/notification.events.js'
-import _ from './bootstrap.js'
+import { bootstrap } from '../bootstrap.js'
 import { requireAuthMiddleware } from "./middlewares/require-auth.middleware.js";
 
-const TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
+const _ = bootstrap["t-bot"]
 
-const bot: MyBot = new Bot(TOKEN)
+const bot: MyBot = new Bot(process.env.TELEGRAM_BOT_TOKEN!)
 bot.use(conversations())
 
-// Concertaions
+// Conversations
 bot.use(createConversation(_.conversation.authConversation.register));
 
 // Commands

@@ -7,7 +7,12 @@ import { bootstrap } from '../bootstrap.js'
 
 const app = new Hono()
 .use(logger())
-.use(cors())
+.use(cors({
+    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:3000'],
+    credentials: true,
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization'],
+}))
 .basePath('/api')
 
 import { authRouter } from './routers/auth.router.js'
@@ -39,9 +44,11 @@ app
 .onError(errorHandler)
 .notFound(notFound)
 
+const port = Number(process.env.PORT) || 3000;
+
 serve({
   fetch: app.fetch,
-  port: Number(process.env.PORT!)
+  port: port
 }, (info) => {
   console.log(`Server is running on http://localhost:${info.port}`)
 })

@@ -1,4 +1,7 @@
 import 'dotenv/config.js'
+import { validateEnv } from './config/env.js'
+validateEnv()
+
 import './events/index.js'
 import './database/index.js'
 import './api/app.js'

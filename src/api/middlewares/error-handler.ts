@@ -3,18 +3,26 @@ import { CustomError } from "../../core/errors/custom.error.js";
 
 export const errorHandler: ErrorHandler = (err, c) => {
   let message = 'Internal Server Error';
-  let status = 500;
-
-  //console.log(err);
+  let status;
 
   if (err instanceof CustomError) {
     message = err.message;
-
-    if(err.statusCode) status = err.statusCode as number;
+    if(err.statusCode) status = err.statusCode;
+  } else {
+    console.error('Internal server error:', {
+      message: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+      url: c.req.url,
+      method: c.req.method,
+    });
+    
+    // В продакшене показываем общее сообщение
+    if (process.env.NODE_ENV === 'production') {
+      message = 'Произошла внутренняя ошибка сервера';
+    }
   }
   
   return c.json({
     message,
-    // @ts-ignore
-  }, status);
+  }, status || 500);
 }
