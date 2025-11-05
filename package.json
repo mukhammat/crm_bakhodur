@@ -7,7 +7,7 @@
     "build:server": "tsc",
     "build:front": "cd ./frontend && npm run build",
     "start:server": "pm2 start dist/index.js --name crm_bakhodur_server",
-    "start:front": "cd ./frontend && pm2 start dist/index.js --name crm_bakhodur_front",
+    "start:front": "cd ./frontend && pm2 start 'npm run dev' --name crm_bakhodur_front",
     "generate": "npx drizzle-kit generate",
     "migrate": "npx drizzle-kit migrate",
     "genmig": "npm run generate && npm run migrate",
