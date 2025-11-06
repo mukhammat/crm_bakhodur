@@ -1,9 +1,12 @@
 import { type ErrorHandler } from "hono";
 import { CustomError } from "../../core/errors/custom.error.js";
+import { logToFile } from '../../utils/log-to-file.util.js'
 
 export const errorHandler: ErrorHandler = (err, c) => {
   let message = 'Internal Server Error';
   let status;
+
+  logToFile(`${err}`, 'error.log')
 
   if (err instanceof CustomError) {
     message = err.message;
