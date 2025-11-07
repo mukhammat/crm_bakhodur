@@ -2,7 +2,6 @@ import { Hono } from 'hono'
 import { logger } from 'hono/logger'
 import { cors } from 'hono/cors'
 import { serve } from '@hono/node-server'
-import { db } from '../database/index.js'
 import { bootstrap } from '../bootstrap.js'
 
 const app = new Hono()
