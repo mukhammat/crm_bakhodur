@@ -4,8 +4,8 @@ validateEnv()
 
 import './events/index.js'
 import './database/index.js'
-import './api/app.js'
-import './t-bot/index.js'
+import './infrastructure/http/app.js'
+import './infrastructure/t-bot/index.js'
 import './bootstrap.js'
-import './cron/index.js'
+import './infrastructure/cron/index.js'
 import './database/seeds/index.js'

@@ -8,20 +8,20 @@ import { TaskService } from "./core/services/task.service.js";
 import { TaskStatusService } from "./core/services/task-status.service.js";
 import { UserRoleService } from "./core/services/user-role.service.js";
 import { UserService } from "./core/services/user.service.js";
-import { AuthController } from "./api/controllers/auth.controller.js";
-import { TaskController } from "./api/controllers/task.controller.js";
-import { TaskStatusController } from "./api/controllers/task-status.controller.js";
-import { UserRoleController } from "./api/controllers/user-role.controller.js";
-import { UserController } from "./api/controllers/user.controller.js";
-import { PermissionController } from "./api/controllers/permission.controller.js";
-import { RolePermissionController } from "./api/controllers/role-permission.controller.js";
-import { TaskAssignmentController } from "./api/controllers/task-assignment.controller.js";
-import { NotificationController } from "./api/controllers/notification.controller.js";
-import { TaskCallback } from './t-bot/callbacks/task.callback.js'
-import { TaskCommand } from "./t-bot/commands/task.command.js";
-import { MainCommand } from "./t-bot/commands/main.command.js";
-import { AuthCommand } from "./t-bot/commands/auth.command.js";
-import { AuthConversation } from "./t-bot/conversations/auth.conversation.js";
+import { AuthController } from "./infrastructure/http/controllers/auth.controller.js";
+import { TaskController } from "./infrastructure/http/controllers/task.controller.js";
+import { TaskStatusController } from "./infrastructure/http/controllers/task-status.controller.js";
+import { UserRoleController } from "./infrastructure/http/controllers/user-role.controller.js";
+import { UserController } from "./infrastructure/http/controllers/user.controller.js";
+import { PermissionController } from "./infrastructure/http/controllers/permission.controller.js";
+import { RolePermissionController } from "./infrastructure/http/controllers/role-permission.controller.js";
+import { TaskAssignmentController } from "./infrastructure/http/controllers/task-assignment.controller.js";
+import { NotificationController } from "./infrastructure/http/controllers/notification.controller.js";
+import { TaskCallback } from './infrastructure/t-bot/callbacks/task.callback.js'
+import { TaskCommand } from "./infrastructure/t-bot/commands/task.command.js";
+import { MainCommand } from "./infrastructure/t-bot/commands/main.command.js";
+import { AuthCommand } from "./infrastructure/t-bot/commands/auth.command.js";
+import { AuthConversation } from "./infrastructure/t-bot/conversations/auth.conversation.js";
 
 export const createBootstrap = () => {
     const authService = new AuthService(db);
@@ -95,24 +95,3 @@ export const createBootstrap = () => {
 }
 
 export const bootstrap = createBootstrap();
-
-// class Bootstrap {
-//     private m = new Map<string, any>();
-  
-//     // C — тип конструктора, InstanceType<C> — тип создаваемого экземпляра
-//     register<C extends new (...args: any[]) => any>(
-//       title: string,
-//       Class: C,
-//       ...args: ConstructorParameters<C>
-//     ): InstanceType<C> {
-//       const instance = new Class(...args);
-//       this.m.set(title, instance);
-//       return instance as InstanceType<C>;
-//     }
-  
-//     // Вызывающий указывает тип: const s = container.get<MyService>('srv')
-//     get<T = any>(title: string): T | undefined {
-//       return this.m.get(title) as T | undefined;
-//     }
-// }
-
