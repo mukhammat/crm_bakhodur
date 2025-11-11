@@ -2,10 +2,13 @@ import type { ErrorHandler } from "grammy";
 import type { MyContext } from "../types/grammy.type.js";
 import { HttpError, GrammyError }from "grammy";
 import { CustomError } from "../../core/errors/custom.error.js"
+import { logToFile } from '../../utils/log-to-file.util.js'
 
 export const errorHandlerMiddleware: ErrorHandler<MyContext> =  async (err) => {
   const ctx = err.ctx;
   const e = err.error;
+
+  logToFile(`Telegram Bot Error - \n${err}`)
 
   if (e instanceof GrammyError) {
     console.error("Error in request:", e.description);
