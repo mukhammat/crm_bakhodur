@@ -2,9 +2,12 @@
   "name": "crm_bakhodur",
   "type": "module",
   "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:front\"",
     "dev:server": "concurrently \"tsc -w\" \"nodemon\"",
     "dev:front": "cd ./frontend && npm run dev",
+    "build": "concurrently \"npm run build:server\" \"npm run build:front\"",
     "build:server": "tsc",
+    "build:front": "cd ./frontend && npm run build",
     "start:server": "tsc && pm2 start dist/index.js --name crm_bakhodur_server",
     "start:front": "cd ./frontend && pm2 start 'npm run dev' --name crm_bakhodur_front",
     "generate": "npx drizzle-kit generate",
