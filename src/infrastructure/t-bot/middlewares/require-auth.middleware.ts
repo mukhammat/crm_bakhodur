@@ -1,18 +1,9 @@
 import type { Middleware } from "grammy";
 import type { MyContext } from "../types/grammy.type.js";
-import db, { users } from "../../../database/index.js";
-import { eq } from "drizzle-orm";
+import { bootstrap } from '../../../bootstrap.js'
 
 export const requireAuthMiddleware: Middleware<MyContext> = async (ctx, next) => {
-    const user = await db.
-    query
-    .users
-    .findFirst({
-        where: eq(users.telegramId, ctx.chatId || 0),
-        columns: {
-            id: true
-        }
-    })
+    const user = await bootstrap.core.services.userService.getByTelegramId(ctx.chatId || 0)
 
     if(!user) {
         await ctx.reply('Доступ запрещен! Если есть ключ вы можете зарегистрироватся нажав на команду /register')
