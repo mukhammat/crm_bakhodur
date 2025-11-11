@@ -3,7 +3,10 @@ import type { DrizzleClient } from "../../database/index.js";
 import { schema } from "../../database/index.js";
 import type { InferResultType } from "../../database/index.js";
 
-export type RolePermissionType = InferResultType<'rolePermissions'>;
+export type RolePermissionType = InferResultType<'rolePermissions', {
+  permission: true,
+  role: true,
+}>;
 
 export interface IRolePermissionService {
   getByRoleId(roleId: number): Promise<RolePermissionType[]>;

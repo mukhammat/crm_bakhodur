@@ -1,6 +1,5 @@
 import { createMiddleware } from 'hono/factory'
-import { schema, db } from '../../../database/index.js'
-import { eq } from 'drizzle-orm'
+import { bootstrap } from '../../../bootstrap.js'
 import { CustomError } from '../../../core/errors/custom.error.js'
 
 export type AllowedPermission = string
@@ -16,12 +15,7 @@ export const requirePermission = (permissions: AllowedPermission[]) => {
     const userRoleId = payload.roleId;
 
     // Get all permission titles from role (rolePermissions)
-    const rolePerms = await db.query.rolePermissions.findMany({
-      where: eq(schema.rolePermissions.roleId, userRoleId),
-      with: {
-        permission: true
-      }
-    });
+    const rolePerms = await bootstrap.core.services.rolePermissionService.getByRoleId(userRoleId)
 
     // Extract permission titles
     const rolePermissionTitles = rolePerms.map(rp => rp.permission.title);
