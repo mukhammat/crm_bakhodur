@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "CRM Bakhodur",
+    "slug": "crm-bakhodur-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.bakhodur.crm"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.bakhodur.crm",
+      "versionCode": 1,
+      "permissions": [],
+      "usesCleartextTraffic": true
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3d09d4e5-5d0b-4ca1-bf24-45aefb4c19a5"
+      }
+    }
+  }
+}

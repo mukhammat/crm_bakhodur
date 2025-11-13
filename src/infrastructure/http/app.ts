@@ -7,26 +7,27 @@ import { bootstrap } from '../../bootstrap.js'
 const app = new Hono()
 .use(logger())
 .use(cors({
-    origin: (origin, _) => {
-        if (!origin || origin === 'null') {
-            return '*'; // Разрешаем запросы без origin (мобильные приложения)
+    origin: (origin) => {
+        // Мобильные приложения (APK) НЕ отправляют origin заголовок
+        // Поэтому разрешаем все запросы без origin - это мобильные приложения
+        if (!origin || origin === 'null' || origin === 'file://') {
+            return '*'; // Разрешаем мобильные приложения
         }
         
-        // Разрешенные origins для веб-приложений
+        // Для веб-приложений проверяем список разрешенных origins
         const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [
             'http://localhost:5173', 
             'http://localhost:3000', 
             'http://localhost:5174', 
             'http://localhost:8081',
             'exp://192.168.156.189:8081',
-            'http://45.63.43.62:3322', // Ваш сервер
         ];
         
         if (allowedOrigins.includes(origin)) {
             return origin;
         }
         
-        return null; // Блокируем неразрешенные origins
+        return null; // Блокируем неразрешенные веб-приложения
     },
     credentials: true,
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
