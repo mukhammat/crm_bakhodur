@@ -7,7 +7,27 @@ import { bootstrap } from '../../bootstrap.js'
 const app = new Hono()
 .use(logger())
 .use(cors({
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:3000'],
+    origin: (origin, _) => {
+        if (!origin || origin === 'null') {
+            return '*'; // Разрешаем запросы без origin (мобильные приложения)
+        }
+        
+        // Разрешенные origins для веб-приложений
+        const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [
+            'http://localhost:5173', 
+            'http://localhost:3000', 
+            'http://localhost:5174', 
+            'http://localhost:8081',
+            'exp://192.168.156.189:8081',
+            'http://45.63.43.62:3322', // Ваш сервер
+        ];
+        
+        if (allowedOrigins.includes(origin)) {
+            return origin;
+        }
+        
+        return null; // Блокируем неразрешенные origins
+    },
     credentials: true,
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
