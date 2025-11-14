@@ -13,18 +13,40 @@ services:
     ports:
       - "${POSTGRES_PORT:-5433}:5432"
 
+  redis:
+    image: redis:7-alpine
+    container_name: crm_redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: crm_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
   backend:
     build: .
     container_name: crm_backend
     restart: always
     depends_on:
       - db
+      - redis
     environment:
       DATABASE_URL: ${DATABASE_URL}
       SECRET_KEY: ${SECRET_KEY}
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-3000}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
     ports:
       - "${PORT:-3000}:${PORT:-3000}"
     command: >
@@ -35,3 +57,8 @@ services:
       "
     volumes:
       - .:/app
+
+
+volumes:
+  postgres_data:
+  redis_data:
