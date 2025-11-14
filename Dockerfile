@@ -12,7 +12,7 @@ RUN npm ci
 COPY . .
 
 # Сборка TypeScript проекта
-RUN npm run build
+RUN npm run build:server
 
 # --- Финальный продакшен-образ ---
 FROM node:20-slim AS server

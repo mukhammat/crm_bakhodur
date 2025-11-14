@@ -1,0 +1,15 @@
+node_modules
+frontend/node_modules
+postgres_data
+dist
+.env
+.env.local
+.env.development
+.env.production
+.git
+.gitignore
+.vscode
+npm-debug.log
+.DS_Store
+coverage
+build
