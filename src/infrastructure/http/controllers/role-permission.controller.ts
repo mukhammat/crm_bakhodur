@@ -17,7 +17,7 @@ export class RolePermissionController {
     const roleId = parseInt(c.req.param('roleId'));
     
     if (isNaN(roleId)) {
-      throw new CustomError('Неверный ID роли', 400);
+      throw new CustomError('Role ID is not correct!', 400);
     }
 
     const permissions = await this.rolePermissionService.getByRoleId(roleId);
@@ -29,7 +29,7 @@ export class RolePermissionController {
     const { permissionId } = await c.req.json();
 
     if (isNaN(roleId)) {
-      throw new CustomError('Неверный ID роли', 400);
+      throw new CustomError('Role ID is not correct!', 400);
     }
 
     if (!permissionId) {

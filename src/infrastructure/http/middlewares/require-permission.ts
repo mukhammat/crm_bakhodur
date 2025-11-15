@@ -9,7 +9,7 @@ export const requirePermission = (permissions: AllowedPermission[]) => {
     const payload = c.get('jwtPayload') as any
 
     if (!payload) {
-      return c.json({ message: 'Нет доступа!' }, 403)
+      return c.json({ message: 'Access denied!' }, 403)
     }
 
     const userRoleId = payload.roleId;
@@ -28,7 +28,7 @@ export const requirePermission = (permissions: AllowedPermission[]) => {
     );
 
     if (!hasAccess) {
-      throw new CustomError('Нет доступа! У вас нет необходимых разрешений.', 403)
+      throw new CustomError('Access denied! Or permission denied.', 403)
     }
 
     await next()
