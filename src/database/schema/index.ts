@@ -22,6 +22,8 @@ export const users = table("users", {
   name: t.varchar('name', { length: 100 }).notNull(),
   isActive: t.boolean('is_active').notNull().default(true),
   telegramId: t.integer('telegram_id').unique(),
+
+  fcmToken: t.text('fcm_token')
 });
 
 export const tasks = table("tasks", {

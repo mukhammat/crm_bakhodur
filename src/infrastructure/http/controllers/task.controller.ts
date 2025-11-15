@@ -1,7 +1,6 @@
 import type { Context } from "hono";
 import type { ITaskService } from "../../../core/services/task.service.js";
 import type { ContextJWT } from '../types/context-jwt.js'
-import { eventBus } from '../../../events/event-bus.js'
 
 export class TaskController {
   constructor(private taskService: ITaskService) {}

@@ -31,3 +31,6 @@ lerna-debug.log*
 dist/
 static/
 /src/database/migrations
+
+# Firebase
+/src/infrastructure/firebase/*.json

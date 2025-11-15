@@ -1,6 +1,6 @@
 import type { Context } from 'hono'
 import type { ITaskAssignmentService } from '../../../core/services/task-assignment.service.js'
-import { eventBus } from '../../../events/event-bus.js'
+import { bootstrap } from '../../../bootstrap.js'
 
 export class TaskAssignmentController {
     constructor(private taskAssignmentService: ITaskAssignmentService) {}
@@ -8,7 +8,7 @@ export class TaskAssignmentController {
     create = async (c: Context) => {
         const { taskId, userId } = await c.req.json()
         const assignment = await this.taskAssignmentService.create(taskId, userId)
-        eventBus.emit('task.assigned', { taskId, userId })
+        bootstrap.eventBus.emit('task:assigned', { taskId, userId })
         return c.json({ assignment }, 201)
     }
 

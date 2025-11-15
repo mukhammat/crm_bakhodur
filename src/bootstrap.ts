@@ -1,3 +1,4 @@
+import { EventEmitter } from 'eventemitter3';
 import { db } from "./database/index.js";
 import { AuthService } from "./core/services/auth.service.js";
 import { NotificationService } from "./core/services/notification.service.js";
@@ -23,7 +24,17 @@ import { MainCommand } from "./infrastructure/t-bot/commands/main.command.js";
 import { AuthCommand } from "./infrastructure/t-bot/commands/auth.command.js";
 import { AuthConversation } from "./infrastructure/t-bot/conversations/auth.conversation.js";
 
+type NotificationEvents = {
+    'task:created': { taskId: string; userId: string };
+    'task:assigned': { taskId: string; userId: string };
+    'task:completed': { taskId: string };
+    'task.remember': { taskId: string, userId: string, }
+};
+
+
 export const createBootstrap = () => {
+    const eventBus = new EventEmitter<NotificationEvents>();
+
     const authService = new AuthService(db);
     const notificationService = new NotificationService(db);
     const permissionService = new PermissionService(db);
@@ -52,6 +63,7 @@ export const createBootstrap = () => {
 
     return {
         db: db,
+        eventBus,
         core: {
             services: {
                 authService,

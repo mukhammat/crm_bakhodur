@@ -1,21 +1,20 @@
 import cron from 'cron'
 import { bootstrap } from '../../bootstrap.js'
-import { eventBus } from '../../events/event-bus.js'
+
+const eventBus = bootstrap.eventBus;
 
 /**
- * Напоминания о задачах с dueDate
- * Запускается в 9:00, 11:00, 16:00, 19:00 каждый день
+ * Remember tasks with dueDate
+ * It runs at 9:00, 11:00, 16:00, 19:00 every day by OAE timestamp
  */
 const sendTaskReminders = async () => {
   try {
     const taskService = bootstrap.core.services.taskService;
 
-    // Получаем все задачи с dueDate для напоминаний через сервис
     const tasksWithDueDate = await taskService.getTasksForReminders();
 
-    console.log(`[Cron] Найдено задач для напоминаний: ${tasksWithDueDate.length}`);
+    console.log(`[Cron] Tasks for remembing: ${tasksWithDueDate.length}`);
 
-    // Для каждой задачи отправляем напоминание назначенным пользователям
     for (const task of tasksWithDueDate) {
       if (!task.assignments || task.assignments.length === 0) {
         continue;
@@ -26,38 +25,31 @@ const sendTaskReminders = async () => {
           continue;
         }
 
-        // Отправляем событие напоминания
         eventBus.emit('task.remember', {
           taskId: task.id,
           userId: assignment.user.id,
-          taskTitle: task.title,
-          taskDescription: task.description,
-          dueDate: task.dueDate,
         });
 
-        console.log(`[Cron] Отправлено напоминание для задачи ${task.id} пользователю ${assignment.user.id}`);
+        console.log(`[Cron] Send rememb for Task with ID ${task.id} and user with ID ${assignment.user.id}`);
       }
     }
   } catch (error) {
-    console.error('[Cron] Ошибка при отправке напоминаний:', error);
+    console.error('[Cron] Rememb send error:', error);
   }
 };
 
-// Создаем cron задачи для каждого времени: 9:00, 11:00, 16:00, 19:00
 const reminderTimes = [
-  '0 9 * * *',  // 9:00 каждый день
-  '0 11 * * *', // 11:00 каждый день
-  '0 16 * * *', // 16:00 каждый день
-  '0 19 * * *', // 19:00 каждый день
+  '0 9 * * *',
+  '0 11 * * *',
+  '0 16 * * *',
+  '0 19 * * *',
 ];
 
-// Создаем и запускаем cron задачи
 const jobs = reminderTimes.map((cronTime, index) => {
-  // start: true - запускает задачу автоматически при создании
   const job = new cron.CronJob(cronTime, sendTaskReminders, null, true, 'Asia/Dubai');
-  console.log(`[Cron] Запущено напоминание #${index + 1} по расписанию: ${cronTime} (часовой пояс: Asia/Dubai)`);
+  console.log(`[Cron] Remember is runned #${index + 1} : ${cronTime} (Asia/Dubai)`);
   return job;
 });
 
-// Экспортируем для возможности остановки при необходимости
+
 export { sendTaskReminders, jobs };

@@ -1,6 +1,6 @@
 import type { ContextJWT } from '../types/context-jwt.js'
 import type { IUserService } from "../../../core/services/user.service.js";
-import type { RoleDto, UpdateDto } from "../../../core/dto/user.dto.js";
+import type { UpdateDto } from "../../../core/dto/user.dto.js";
 
 export class UserController {
   constructor(private userService: IUserService) {}
@@ -46,5 +46,18 @@ export class UserController {
     return c.json({
       user
     })
+  }
+
+  saveFcmToken = async (c: ContextJWT) => {
+    const { id } = c.get('jwtPayload');
+    const { fcmToken } = await c.req.json();
+
+    if(!fcmToken || typeof fcmToken !== 'string') {
+      return c.json({ message: 'Type of fcmToken not currect' }, 401)
+    }
+
+    await this.userService.saveFcmToken(fcmToken, id);
+
+    return c.json({ message: 'Fcm Token is saved!' })
   }
 }

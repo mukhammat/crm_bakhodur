@@ -1,4 +1,4 @@
-import { users, userRoles, type DrizzleClient } from "../../database/index.js";
+import { users, type DrizzleClient } from "../../database/index.js";
 import type { GetUserDto, ParamsType, UpdateDto } from "../dto/user.dto.js";
 import { and, eq, type SQL } from "drizzle-orm";
 import { CustomError } from "../errors/custom.error.js";
@@ -9,6 +9,7 @@ export interface IUserService {
   delete(userId: string): Promise<string>
   getById(userId: string): Promise<GetUserDto | undefined>
   getByTelegramId(telegramId: number): Promise<{ id: string } | undefined>
+  saveFcmToken(fcmToken: string, userId: string): Promise<string>
 }
 
 export class UserService implements IUserService {
@@ -88,5 +89,18 @@ export class UserService implements IUserService {
         id: true
       }
     })
+  }
+
+  public async saveFcmToken(fcmToken: string, userId: string) {
+    const [user] = await this.db.update(users)
+    .set({
+      fcmToken
+    })
+    .where(eq(users.id, userId))
+    .returning({
+      id: users.id
+    });
+
+    return user.id
   }
 }

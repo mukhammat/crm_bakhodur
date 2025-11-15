@@ -1,5 +1,4 @@
 import { InlineKeyboard, type Bot } from "grammy";
-import { eventBus } from "../../../events/event-bus.js";
 import { bootstrap } from "../../../bootstrap.js";
 import type { MyBot } from "../types/grammy.type.js";
 
@@ -10,7 +9,7 @@ export function notificationEvents(
     const userService = bootstrap.core.services.userService;
     
     // Обработчик события назначения задачи
-    eventBus.on('task.assigned', async (data) => {
+    bootstrap.eventBus.on('task:assigned', async (data) => {
       try {
         const { taskId, userId } = data;
         console.log('Assigning task:', data);
@@ -51,9 +50,9 @@ export function notificationEvents(
     });
 
     // Обработчик события напоминания о задаче
-    eventBus.on('task.remember', async (data) => {
+    bootstrap.eventBus.on('task.remember', async (data) => {
       try {
-        const { taskId, userId, taskTitle, taskDescription, dueDate } = data;
+        const { taskId, userId } = data;
         console.log('Task reminder:', data);
       
         const user = await userService.getById(userId);
@@ -67,17 +66,6 @@ export function notificationEvents(
           console.log('User does not have a telegramId, skipping reminder.');
           return;
         }
-
-        // Форматируем дату срока выполнения
-        const dueDateFormatted = dueDate 
-          ? new Date(dueDate).toLocaleString('ru-RU', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })
-          : 'не указан';
 
         const task = await taskService.getById(taskId);
 
@@ -101,9 +89,9 @@ export function notificationEvents(
         }
 
         const message = `🔔 Напоминание о задаче!\n\n` +
-          `📋 ${taskTitle}\n` +
-          `${taskDescription}\n\n` +
-          `⏰ Срок выполнения: ${dueDateFormatted}`;
+          `📋 ${task.title}\n` +
+          `${task.description}\n\n` +
+          `⏰ Срок выполнения: ${task.dueDate}`;
 
         await bot.api.sendMessage(user.telegramId, message, {
           reply_markup: inline

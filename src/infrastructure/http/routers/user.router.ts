@@ -12,4 +12,5 @@ export const userRouter = (userController: UserController) => {
   .put('/', userController.update)
   .use(requirePermission(['DELETE_USERS']))
   .delete('/:id', userController.delete)
+  .post('/save-fcm-token', userController.saveFcmToken)
 };
