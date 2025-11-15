@@ -8,13 +8,10 @@ const app = new Hono()
 .use(logger())
 .use(cors({
     origin: (origin) => {
-        // Мобильные приложения (APK) НЕ отправляют origin заголовок
-        // Поэтому разрешаем все запросы без origin - это мобильные приложения
         if (!origin || origin === 'null' || origin === 'file://') {
-            return '*'; // Разрешаем мобильные приложения
+            return '*';
         }
         
-        // Для веб-приложений проверяем список разрешенных origins
         const allowedOrigins = process.env.CORS_ORIGIN?.split(',') || [
             'http://localhost:5173', 
             'http://localhost:3000', 
@@ -27,7 +24,7 @@ const app = new Hono()
             return origin;
         }
         
-        return null; // Блокируем неразрешенные веб-приложения
+        return null;
     },
     credentials: true,
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

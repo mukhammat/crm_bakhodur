@@ -4,14 +4,14 @@ import * as schema from './schema/index.js';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL!,
-  max: 20, // Максимальное количество клиентов в пуле
-  idleTimeoutMillis: 30000, // Закрыть неактивные клиенты через 30 секунд
-  connectionTimeoutMillis: 2000, // Таймаут подключения 2 секунды
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
 });
 
 // Обработка ошибок подключения
 pool.on('error', (err) => {
-  console.error('Неожиданная ошибка в пуле подключений к БД:', err);
+  console.error('Error in pull db:', err);
 });
 
 export const db = drizzle({
@@ -20,15 +20,15 @@ export const db = drizzle({
   schema,
 });
 
-// Проверка подключения к БД
+// Connect db
 pool.connect()
   .then((client) => {
-    console.log('БД успешно подключена');
+    console.log('Db connected');
     client.release();
   })
   .catch((error) => {
-    console.error('Ошибка подключения к БД:', error.message);
-    console.error('Проверьте правильность DATABASE_URL и доступность сервера БД');
+    console.error('Error db connect:', error.message);
+    console.error('Check DATABASE_URL and db server');
     process.exit(1);
   });
 

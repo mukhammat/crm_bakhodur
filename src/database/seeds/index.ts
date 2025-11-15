@@ -3,7 +3,7 @@ import { db } from '../index.js'
 import { eq } from "drizzle-orm";
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log('Seeding database...');
 
   const ROLES = {Admin: 'ADMIN', Manager: 'MANAGER', Worker: 'WORKER'} as const;
   const STATUSES = {New: 'NEW', InProgress: 'IN_PROGRESS', Completed: 'COMPLETED'} as const;
@@ -126,7 +126,7 @@ async function main() {
     .onConflictDoNothing();
   }
 
-  console.log('🎉 Seeding completed!');
+  console.log('Seeding completed!');
 }
 
 main();
