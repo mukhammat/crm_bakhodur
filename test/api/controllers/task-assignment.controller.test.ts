@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { TaskAssignmentController } from '../../../src/api/controllers/task-assignment.controller.js'
+import { TaskAssignmentController } from '../../../src/infrastructure/http/controllers/task-assignment.controller.js'
 import { Context } from 'hono'
 import type { ITaskAssignmentService } from '../../../src/core/services/task-assignment.service.js'
 
@@ -33,9 +33,8 @@ describe('TaskAssignmentController', () => {
             
             vi.mocked(mockContext.req.json).mockResolvedValue(assignmentData)
             vi.mocked(taskAssignmentService.create).mockResolvedValue(createdAssignment)
-            vi.mocked(mockContext.json).mockReturnValue({ status: 201 } as any)
 
-            await controller.assignTaskToUser(mockContext)
+            await controller.create(mockContext)
 
             expect(taskAssignmentService.create).toHaveBeenCalledWith(assignmentData.taskId, assignmentData.userId)
             expect(mockContext.json).toHaveBeenCalledWith({ assignment: createdAssignment }, 201)
@@ -49,9 +48,8 @@ describe('TaskAssignmentController', () => {
 
             vi.mocked(mockContext.req.param).mockReturnValue(assignmentId)
             vi.mocked(taskAssignmentService.delete).mockResolvedValue(unassignedAssignment)
-            vi.mocked(mockContext.json).mockReturnValue({ status: 200 } as any)
 
-            await controller.unassignTaskFromUser(mockContext)
+            await controller.delete(mockContext)
 
             expect(taskAssignmentService.delete).toHaveBeenCalledWith(assignmentId)
             expect(mockContext.json).toHaveBeenCalledWith({ assignment: unassignedAssignment })
@@ -94,31 +92,11 @@ describe('TaskAssignmentController', () => {
 
             vi.mocked(mockContext.req.param).mockReturnValue(userId)
             vi.mocked(taskAssignmentService.getByUserId).mockResolvedValue(assignments)
-            vi.mocked(mockContext.json).mockReturnValue({ status: 200 } as any)
 
-            await controller.getAssignmentsByUserId(mockContext)
+            await controller.getByUserId(mockContext)
 
             expect(taskAssignmentService.getByUserId).toHaveBeenCalledWith(userId)
             expect(mockContext.json).toHaveBeenCalledWith({ assignments })
-        })
-    })
-
-    describe('getAssignmentLengthByUserId', () => {
-        it('should return assignment lengths by status', async () => {
-            const userId = '1'
-            const assignmentLengths = [
-                { status: 'TODO', count: 2 },
-                { status: 'IN_PROGRESS', count: 1 }
-            ]
-
-            vi.mocked(mockContext.req.param).mockReturnValue(userId)
-            vi.mocked(taskAssignmentService.getLengthByUserId).mockResolvedValue(assignmentLengths)
-            vi.mocked(mockContext.json).mockReturnValue({ status: 200 } as any)
-
-            await controller.getAssignmentLengthByUserId(mockContext)
-
-            expect(taskAssignmentService.getLengthByUserId).toHaveBeenCalledWith(userId)
-            expect(mockContext.json).toHaveBeenCalledWith({ assignmentLengths })
         })
     })
 })

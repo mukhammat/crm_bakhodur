@@ -1,16 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Hono } from 'hono';
-import { TaskController } from '../../../src/api/controllers/task.controller.js';
+import { TaskController } from '../../../src/infrastructure/http/controllers/task.controller.js';
 import type { ITaskService } from '../../../src/core/services/task.service.js';
-import { ContextJWT } from '../../../src/api/types/context-jwt.js';
+import { ContextJWT } from '../../../src/infrastructure/http/types/context-jwt.js';
 
-// Мок сервиса
+// Service mock
 const createMockService = (): ITaskService => ({
   create: vi.fn(),
   getById: vi.fn(),
   getAll: vi.fn(),
   update: vi.fn(),
   delete: vi.fn(),
+  getTasksForReminders: vi.fn(),
 });
 
 describe('TaskController', () => {
@@ -25,7 +26,7 @@ describe('TaskController', () => {
   });
 
   describe('POST /tasks - create', () => {
-    it('должен создать задачу и вернуть её', async () => {
+    it('should create task and return it', async () => {
       const createdTask = { 
         id: 'task-1', 
         title: 'Test Task', 
@@ -59,7 +60,7 @@ describe('TaskController', () => {
       });
     });
 
-    it('должен вернуть 400 если нет title', async () => {
+    it('should return 400 if title is missing', async () => {
       app.post('/tasks', async (c: ContextJWT) => {
         c.set('jwtPayload', { id: 'user-1' });
         const { title, description } = await c.req.json();
@@ -84,7 +85,7 @@ describe('TaskController', () => {
   });
 
   describe('GET /tasks/:id - getById', () => {
-    it('должен вернуть задачу по ID', async () => {
+    it('should return task by ID', async () => {
       const task = { 
         id: 'task-1', 
         title: 'Test Task',
@@ -114,7 +115,7 @@ describe('TaskController', () => {
       expect(mockService.getById).toHaveBeenCalledWith('task-1');
     });
 
-    it('должен вернуть 404 если задача не найдена', async () => {
+    it('should return 404 if task not found', async () => {
       vi.mocked(mockService.getById).mockResolvedValue(null);
 
       app.get('/tasks/:id', async (c) => {
@@ -134,7 +135,7 @@ describe('TaskController', () => {
   });
 
   describe('GET /tasks - getAll', () => {
-    it('должен вернуть все задачи', async () => {
+    it('should return all tasks', async () => {
       const tasks = [
         { 
           id: 'task-1', 
@@ -163,10 +164,10 @@ describe('TaskController', () => {
 
       expect(res.status).toBe(200);
       const data = await res.json();
-      // Проверяем что массив существует и имеет правильную длину
+      // Check that array exists and has correct length
       expect(data.tasks).toBeDefined();
       expect(data.tasks.length).toBe(2);
-      // Проверяем первую задачу без даты
+      // Check first task without date
       expect(data.tasks[0]).toMatchObject({
         id: 'task-1',
         title: 'Task 1',
@@ -180,7 +181,7 @@ describe('TaskController', () => {
       expect(mockService.getAll).toHaveBeenCalledWith({});
     });
 
-    it('должен передать query параметры в сервис', async () => {
+    it('should pass query parameters to service', async () => {
       vi.mocked(mockService.getAll).mockResolvedValue([]);
 
       app.get('/tasks', (c) => controller.getAll(c));
@@ -195,7 +196,7 @@ describe('TaskController', () => {
   });
 
   describe('PUT /tasks/:id - update', () => {
-    it('должен обновить задачу', async () => {
+    it('should update task', async () => {
       const updatedTask = { 
         id: 'task-1', 
         title: 'Updated Title',
@@ -233,7 +234,7 @@ describe('TaskController', () => {
   });
 
   describe('DELETE /tasks/:id - delete', () => {
-    it('должен удалить задачу', async () => {
+    it('should delete task', async () => {
       const deletedTask = { 
         id: 'task-1', 
         title: 'Deleted',

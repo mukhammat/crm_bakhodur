@@ -1,9 +1,9 @@
 import { Hono } from 'hono';
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import type { IUserService } from '../../../src/core/services/user.service.js';
-import { UserController } from '../../../src/api/controllers/user.controller.js';
-import { ContextJWT } from '../../../src/api/types/context-jwt.js';
-import { errorHandler } from '../../../src/api/middlewares/error-handler.js';
+import { UserController } from '../../../src/infrastructure/http/controllers/user.controller.js';
+import { ContextJWT } from '../../../src/infrastructure/http/types/context-jwt.js';
+import { errorHandler } from '../../../src/infrastructure/http/middlewares/error-handler.js';
 import { CustomError } from '../../../src/core/errors/custom.error.js'
 
 const createMockService = (): IUserService => ({
@@ -12,6 +12,7 @@ const createMockService = (): IUserService => ({
   delete: vi.fn(),
   getById: vi.fn(),
   getByTelegramId: vi.fn(),
+  saveFcmToken: vi.fn(),
 });
 
 describe('UserController', () => {
@@ -33,7 +34,8 @@ describe('UserController', () => {
           roleId: 2,
           email: 'a@a.com',
           isActive: true,
-          telegramId: null
+          telegramId: null,
+          fcmToken: null
       }
       vi.mocked(mockService.getById).mockResolvedValue(userData);
 
@@ -46,7 +48,7 @@ describe('UserController', () => {
 
       expect(res.status).toBe(200);
       const data = await res.json();
-      expect(data).toEqual({ user: userData });
+      expect(data).toEqual({ user: { ...userData } });
       expect(mockService.getById).toHaveBeenCalledWith('user-1');
     });
 
@@ -106,7 +108,8 @@ describe('UserController', () => {
           role: {
             id: 2,
             title: 'ADMIN'
-          }
+          },
+          fcmToken: null
         },
         {
           id: 'user-2',
@@ -118,7 +121,8 @@ describe('UserController', () => {
           role: {
             id: 2,
             title: 'ADMIN'
-          }
+          },
+          fcmToken: null
         }
       ];
       vi.mocked(mockService.getAll).mockResolvedValue(users);

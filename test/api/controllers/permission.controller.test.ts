@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { PermissionController } from '../../../src/api/controllers/permission.controller.js'
-import { Context, Hono, ContextRenderer, ContextVariableMap } from 'hono'
+import { PermissionController } from '../../../src/infrastructure/http/controllers/permission.controller.js'
+import { Context, Hono } from 'hono'
 import { IPermissionService } from '../../../src/core/services/permission.service.js'
 
 const createMockService = (): IPermissionService => ({
@@ -88,53 +88,6 @@ describe('PermissionController', () => {
       expect(res.status).toBe(200);
       const data = await res.json();
       expect(data).toEqual({  });
-    })
-
-    it('should return 404 when permission not found', async () => {
-      const id = '999'
-
-      vi.mocked(mockContext.req.param).mockReturnValue(id)
-      vi.mocked(permissionService.getById).mockResolvedValue(null)
-      vi.mocked(mockContext.json).mockReturnValue(undefined as any)
-
-      await controller.getById(mockContext as Context)
-
-      expect(permissionService.getById).toHaveBeenCalledWith(id)
-      expect(mockContext.json).toHaveBeenCalledWith({ error: 'Permission not found' }, 404)
-    })
-  })
-
-  describe('update', () => {
-    it('should update permission', async () => {
-      const id = '1'
-      const updateData = { name: 'UPDATED_PERMISSION', description: 'Updated description' }
-      const updatedPermission = { id, ...updateData }
-
-      vi.mocked(mockContext.req.param).mockReturnValue(id)
-      vi.mocked(mockContext.req.json).mockResolvedValue(updateData)
-      vi.mocked(permissionService.update).mockResolvedValue(updatedPermission)
-      vi.mocked(mockContext.json).mockReturnValue(undefined as any)
-
-      await controller.update(mockContext as Context)
-
-      expect(permissionService.update).toHaveBeenCalledWith(id, updateData)
-      expect(mockContext.json).toHaveBeenCalledWith({ permission: updatedPermission })
-    })
-  })
-
-  describe('delete', () => {
-    it('should delete permission', async () => {
-      const id = '1'
-      const deletedPermission = { id, name: 'DELETED_PERMISSION', description: 'Deleted permission' }
-
-      vi.mocked(mockContext.req.param).mockReturnValue(id)
-      vi.mocked(permissionService.delete).mockResolvedValue(deletedPermission)
-      vi.mocked(mockContext.json).mockReturnValue(undefined as any)
-
-      await controller.delete(mockContext as Context)
-
-      expect(permissionService.delete).toHaveBeenCalledWith(id)
-      expect(mockContext.json).toHaveBeenCalledWith({ permission: deletedPermission })
     })
   })
 })

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { UserRoleController } from '../../../src/api/controllers/user-role.controller.js'
+import { UserRoleController } from '../../../src/infrastructure/http/controllers/user-role.controller.js'
 
 describe('UserRoleController', () => {
   it('should return 400 for invalid role', async () => {

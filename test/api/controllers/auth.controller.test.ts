@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { AuthController } from '../../../src/api/controllers/auth.controller.js'
+import { AuthController } from '../../../src/infrastructure/http/controllers/auth.controller.js'
 import { Context, Hono } from 'hono';
 import { IAuthService } from '../../../src/core/services/auth.service.js';
 
-// Мок сервиса
+// Service mock
 const createMockService = (): IAuthService => ({
   login: vi.fn(),
   register: vi.fn(),

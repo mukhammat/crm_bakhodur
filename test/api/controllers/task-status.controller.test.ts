@@ -1,9 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { TaskStatusController } from '../../../src/api/controllers/task-status.controller'
+import { TaskStatusController } from '../../../src/infrastructure/http/controllers/task-status.controller.js'
 import { Context } from 'hono'
 import { CustomError } from '../../../src/core/errors/custom.error.js'
 import type { ITaskStatusService } from '../../../src/core/services/task-status.service.js'
-import type { TaskType } from '../../../src/core/dto/task-status.dto.js'
 
 describe('TaskStatusController', () => {
   let taskStatusService: ITaskStatusService
@@ -35,7 +34,6 @@ describe('TaskStatusController', () => {
       
       vi.mocked(mockContext.req.json).mockResolvedValue(taskStatusData)
       vi.mocked(taskStatusService.create).mockResolvedValue(createdId)
-      vi.mocked(mockContext.json).mockReturnValue({ status: 201 } as any)
 
       await controller.create(mockContext as Context)
 
@@ -51,7 +49,6 @@ describe('TaskStatusController', () => {
 
       vi.mocked(mockContext.req.param).mockReturnValue(id)
       vi.mocked(taskStatusService.getById).mockResolvedValue(taskStatus)
-      vi.mocked(mockContext.json).mockReturnValue({ status: 200 } as any)
 
       await controller.getById(mockContext as Context)
 
@@ -76,7 +73,6 @@ describe('TaskStatusController', () => {
       ]
 
       vi.mocked(taskStatusService.getAll).mockResolvedValue(taskStatuses)
-      vi.mocked(mockContext.json).mockReturnValue({ status: 200 } as any)
 
       await controller.getAll(mockContext as Context)
 
