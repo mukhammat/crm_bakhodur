@@ -11,13 +11,39 @@ import Layout from './components/Layout';
 import LoadingSpinner from './components/LoadingSpinner';
 import RegisterPage from './pages/RegisterPage';
 import RequirePermission from './components/RequirePermission';
+import { setupForegroundMessageHandler } from './lib/notifications';
+import toast from 'react-hot-toast';
 
 function App() {
-  const { fetchUser, isLoading } = useAuthStore();
+  const { fetchUser, isLoading, isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
+
+  // Setup notification handler when authenticated
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    let unsubscribe: (() => void) | null = null;
+
+    setupForegroundMessageHandler((payload) => {
+      // Show toast notification
+      if (payload.notification) {
+        toast.success(payload.notification.title || 'New notification', {
+          description: payload.notification.body,
+        });
+      }
+    }).then((unsub) => {
+      unsubscribe = unsub;
+    }).catch((error) => {
+      console.error('Failed to setup notification handler:', error);
+    });
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return <LoadingSpinner />;

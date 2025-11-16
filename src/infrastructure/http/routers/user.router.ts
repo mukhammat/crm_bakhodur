@@ -7,10 +7,10 @@ export const userRouter = (userController: UserController) => {
   return new Hono()
   .use(requireAuth)
   .get('/me', userController.me)
+  .post('/save-fcm-token', userController.saveFcmToken)
   .use(requirePermission(['VIEW_USERS']))
   .get('/', userController.getAll)
   .put('/', userController.update)
   .use(requirePermission(['DELETE_USERS']))
   .delete('/:id', userController.delete)
-  .post('/save-fcm-token', userController.saveFcmToken)
 };

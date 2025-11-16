@@ -20,25 +20,27 @@ bootstrap.eventBus.on('task:assigned', async (data) => {
       return;
     }
 
-    if(!user?.telegramId) {
-      console.log('User does not have a telegramId, skipping notification.');
-      return;
-    }
-
     console.log('Found user:', user);
 
     if(!user.fcmToken) {
-      console.log('Task has not fcmToken!');
+      console.log('User has not fcmToken!');
       return;
     }
 
     const message = {
       token: user.fcmToken,
-      notification: {}
+      notification: {
+        title: 'New Task Assigned',
+        body: `You have been assigned a new task: ${task.title}`
+      },
+      data: {
+        type: 'task_assigned',
+        taskId: task.id,
+        userId: userId
+      }
     }
 
     await firebaseMessaging.send(message)
-
 
     console.log('Task assigned:', data);
     
@@ -60,11 +62,6 @@ bootstrap.eventBus.on('task.remember', async (data) => {
       return;
     }
 
-    if(!user?.telegramId) {
-      console.log('User does not have a telegramId, skipping reminder.');
-      return;
-    }
-
     const task = await bootstrap.core.services.taskService.getById(taskId);
 
     if(!task) {
@@ -79,13 +76,21 @@ bootstrap.eventBus.on('task.remember', async (data) => {
     }
 
     if(!user.fcmToken) {
-      console.log('Task has not fcmToken!');
+      console.log('User has not fcmToken!');
       return;
     }
 
     const message = {
       token: user.fcmToken,
-      notification: {}
+      notification: {
+        title: 'Task Reminder',
+        body: `Reminder: ${task.title} - Due date: ${task.dueDate ? new Date(task.dueDate).toLocaleDateString() : 'No due date'}`
+      },
+      data: {
+        type: 'task_reminder',
+        taskId: task.id,
+        userId: userId
+      }
     }
 
     await firebaseMessaging.send(message)

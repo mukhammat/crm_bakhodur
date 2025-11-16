@@ -239,6 +239,12 @@ class ApiClient {
     const { data } = await this.client.get('/role-permissions/me');
     return data;
   }
+
+  // Notifications
+  async saveFcmToken(fcmToken: string) {
+    const { data } = await this.client.post('/users/save-fcm-token', { fcmToken });
+    return data;
+  }
 }
 
 export const apiClient = new ApiClient();

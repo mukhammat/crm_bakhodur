@@ -26,6 +26,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       const user = await apiClient.getCurrentUser();
       set({ user, isAuthenticated: true, isLoading: false });
       await useAuthStore.getState().fetchPermissions();
+      
+      // Register for push notifications after login
+      const { registerForPushNotificationsAsync, sendTokenToBackend } = await import('../lib/notifications');
+      const token = await registerForPushNotificationsAsync();
+      if (token) {
+        await sendTokenToBackend(token);
+      }
     } catch (error: any) {
       throw error;
     }

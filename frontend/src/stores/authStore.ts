@@ -27,6 +27,23 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ user, isAuthenticated: true, isLoading: false });
       await useAuthStore.getState().fetchPermissions();
       toast.success('Вход выполнен успешно');
+      
+      // Register for push notifications after login
+      try {
+        console.log('[AuthStore] Attempting to get FCM token after login...');
+        const { getFCMToken, sendTokenToBackend } = await import('../lib/notifications');
+        const token = await getFCMToken();
+        console.log('[AuthStore] FCM token result:', token ? 'Token received' : 'No token');
+        if (token) {
+          console.log('[AuthStore] Sending FCM token to backend...');
+          const saved = await sendTokenToBackend(token);
+          console.log('[AuthStore] Token save result:', saved ? 'Success' : 'Failed');
+        } else {
+          console.warn('[AuthStore] FCM token not available. Check console for details.');
+        }
+      } catch (error) {
+        console.error('[AuthStore] Error registering for push notifications:', error);
+      }
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Ошибка входа');
       throw error;
@@ -49,6 +66,23 @@ export const useAuthStore = create<AuthState>((set) => ({
       const user = await apiClient.getCurrentUser();
       set({ user, isAuthenticated: true, isLoading: false });
       await useAuthStore.getState().fetchPermissions();
+      
+      // Register for push notifications after fetching user
+      try {
+        console.log('[AuthStore] Attempting to get FCM token on fetchUser...');
+        const { getFCMToken, sendTokenToBackend } = await import('../lib/notifications');
+        const fcmToken = await getFCMToken();
+        console.log('[AuthStore] FCM token result:', fcmToken ? 'Token received' : 'No token');
+        if (fcmToken) {
+          console.log('[AuthStore] Sending FCM token to backend...');
+          const saved = await sendTokenToBackend(fcmToken);
+          console.log('[AuthStore] Token save result:', saved ? 'Success' : 'Failed');
+        } else {
+          console.warn('[AuthStore] FCM token not available. Check console for details.');
+        }
+      } catch (error) {
+        console.error('[AuthStore] Error registering for push notifications:', error);
+      }
     } catch (error) {
       set({ user: null, isAuthenticated: false, isLoading: false, permissions: [] });
     }

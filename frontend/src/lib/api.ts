@@ -230,6 +230,30 @@ class ApiClient {
     const { data } = await this.client.get('/role-permissions/me');
     return data;
   }
+
+  // Notifications
+  async saveFcmToken(fcmToken: string) {
+    console.log('[API] Sending FCM token to backend:', {
+      url: '/users/save-fcm-token',
+      token: fcmToken.substring(0, 20) + '...',
+      hasAuthToken: !!localStorage.getItem('token'),
+    });
+    try {
+      const { data } = await this.client.post('/users/save-fcm-token', { fcmToken });
+      console.log('[API] FCM token save response:', data);
+      return data;
+    } catch (error: any) {
+      console.error('[API] Error saving FCM token:', error);
+      console.error('[API] Error details:', {
+        message: error?.message,
+        response: error?.response?.data,
+        status: error?.response?.status,
+        url: error?.config?.url,
+        method: error?.config?.method,
+      });
+      throw error;
+    }
+  }
 }
 
 export const apiClient = new ApiClient();
