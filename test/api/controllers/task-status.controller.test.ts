@@ -64,7 +64,7 @@ describe('TaskStatusController', () => {
 
       await expect(controller.getById(mockContext as Context))
         .rejects
-        .toThrow(new CustomError('Неверный формат', 401))
+        .toThrow(new CustomError('Invalid format', 401))
     })
   })
 
@@ -106,7 +106,7 @@ describe('TaskStatusController', () => {
 
       await expect(controller.update(mockContext as Context))
         .rejects
-        .toThrow(new CustomError('Неверный формат', 401))
+        .toThrow(new CustomError('Invalid format', 401))
     })
   })
 
@@ -129,7 +129,7 @@ describe('TaskStatusController', () => {
 
       await expect(controller.delete(mockContext as Context))
         .rejects
-        .toThrow(new CustomError('Неверный формат', 401))
+        .toThrow(new CustomError('Invalid format', 401))
     })
   })
 })

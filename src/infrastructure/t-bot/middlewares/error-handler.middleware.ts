@@ -18,12 +18,12 @@ export const errorHandlerMiddleware: ErrorHandler<MyContext> =  async (err) => {
     console.error("Unknown error:", e);
   }
 
-  // Отправляем сообщение пользователю
+  // Send message to user
   try {
-    // Если это callback, сначала отвечаем на него, 
-    // иначе сообщение «зависнет»
+    // If this is a callback, answer it first, 
+    // otherwise the message will "hang"
     if (ctx.callbackQuery) {
-      await ctx.answerCallbackQuery({ text: "Произошла ошибка, попробуйте снова", show_alert: false });
+      await ctx.answerCallbackQuery({ text: "An error occurred, please try again", show_alert: false });
     }
 
     if(e instanceof CustomError) {
@@ -31,9 +31,9 @@ export const errorHandlerMiddleware: ErrorHandler<MyContext> =  async (err) => {
       return;
     }
 
-    // Отправляем текстовую ошибку
-    await ctx.reply("😔 Упс! Что‑то пошло не так. Попробуйте повторить действие или обратитесь к администратору.");
+    // Send error message
+    await ctx.reply("😔 Oops! Something went wrong. Please try again or contact the administrator.");
   } catch (sendErr) {
-    console.error("Ошибка отправки ошибки пользователью:", sendErr);
+    console.error("Error sending error message to user:", sendErr);
   }
 };

@@ -33,7 +33,7 @@ export class AuthService implements IAuthService {
 
         if (!user) {
             throw new CustomError(
-                'Неправильные данные!'
+                'Invalid credentials!'
             );
         }
 
@@ -42,7 +42,7 @@ export class AuthService implements IAuthService {
 
         if (!isPasswordValid) {
             throw new CustomError(
-                'Неправильные данные!'
+                'Invalid credentials!'
             );
         }
 
@@ -65,7 +65,7 @@ export class AuthService implements IAuthService {
         const roleValue = await redis.get(`register_key:${key}`);
 
         if (!roleValue) {
-            throw new CustomError('Ключ регистрации не найден!');
+            throw new CustomError('Registration key not found!');
         }
 
         // roleValue can be either role id (stored by user-role service) or role title
@@ -79,7 +79,7 @@ export class AuthService implements IAuthService {
         }
 
         if (!role) {
-            throw new CustomError('Указанная роль не найдена в системе!');
+            throw new CustomError('Specified role not found in the system!');
         }
 
         const hash = await this.hashPassword(password);
@@ -123,7 +123,7 @@ export class AuthService implements IAuthService {
     ) {
         if (!this.secretKey) {
         throw new CustomError(
-            'Secret key is не найден'
+            'Secret key not found'
         );
         }
         return jwt.sign(

@@ -20,7 +20,7 @@ export class TaskStatusController {
         const validId = Number(id);
 
         if(isNaN(validId)) {
-            throw new CustomError('Неверный формат', 401);
+            throw new CustomError('Invalid format', 401);
         }
 
         const taskStatus = await this.taskStatusService.getById(validId)
@@ -40,7 +40,7 @@ export class TaskStatusController {
         const validId = Number(id);
 
         if(isNaN(validId)) {
-            throw new CustomError('Неверный формат', 401);
+            throw new CustomError('Invalid format', 401);
         }
 
         const taskStatusId = await this.taskStatusService.update(validId, data);
@@ -53,7 +53,7 @@ export class TaskStatusController {
         const validId = Number(id);
 
         if(isNaN(validId)) {
-            throw new CustomError('Неверный формат', 401);
+            throw new CustomError('Invalid format', 401);
         }
 
         const taskStatusId = 

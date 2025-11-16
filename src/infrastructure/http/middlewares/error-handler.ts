@@ -19,9 +19,9 @@ export const errorHandler: ErrorHandler = (err, c) => {
       method: c.req.method,
     });
     
-    // В продакшене показываем общее сообщение
+    // In production show generic message
     if (process.env.NODE_ENV === 'production') {
-      message = 'Произошла внутренняя ошибка сервера';
+      message = 'Internal server error occurred';
     }
   }
   

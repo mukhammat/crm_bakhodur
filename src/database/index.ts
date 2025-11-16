@@ -9,7 +9,7 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
 });
 
-// Обработка ошибок подключения
+// Connection error handling
 pool.on('error', (err) => {
   console.error('Error in pull db:', err);
 });

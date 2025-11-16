@@ -8,7 +8,7 @@ export function notificationEvents(
     const taskService = bootstrap.core.services.taskService;
     const userService = bootstrap.core.services.userService;
     
-    // Обработчик события назначения задачи
+    // Task assignment event handler
     bootstrap.eventBus.on('task:assigned', async (data) => {
       try {
         const { taskId, userId } = data;
@@ -36,9 +36,9 @@ export function notificationEvents(
         console.log('Found user:', user);
     
         const inline = new InlineKeyboard()
-        .text('Приступить', `take:${task.id}`)
+        .text('Start', `take:${task.id}`)
 
-        await bot.api.sendMessage(user.telegramId, `✅ У вас новая задача: ${task?.title}\n${task?.description}`, {
+        await bot.api.sendMessage(user.telegramId, `✅ You have a new task: ${task?.title}\n${task?.description}`, {
           reply_markup: inline
         });
     
@@ -49,7 +49,7 @@ export function notificationEvents(
       }
     });
 
-    // Обработчик события напоминания о задаче
+    // Task reminder event handler
     bootstrap.eventBus.on('task.remember', async (data) => {
       try {
         const { taskId, userId } = data;
@@ -74,7 +74,7 @@ export function notificationEvents(
           return;
         }
 
-        // Проверяем, что задача еще не выполнена
+        // Check that task is not yet completed
         if(task.statusId === 3) {
           console.log('Task is completed, skipping reminder.');
           return;
@@ -83,15 +83,15 @@ export function notificationEvents(
         const inline = new InlineKeyboard();
         
         if(task.statusId === 1) {
-          inline.text('Приступить', `take:${task.id}`);
+          inline.text('Start', `take:${task.id}`);
         } else if(task.statusId === 2) {
-          inline.text('Закончить', `complete:${task.id}`);
+          inline.text('Complete', `complete:${task.id}`);
         }
 
-        const message = `🔔 Напоминание о задаче!\n\n` +
+        const message = `🔔 Task reminder!\n\n` +
           `📋 ${task.title}\n` +
           `${task.description}\n\n` +
-          `⏰ Срок выполнения: ${task.dueDate}`;
+          `⏰ Due date: ${task.dueDate}`;
 
         await bot.api.sendMessage(user.telegramId, message, {
           reply_markup: inline

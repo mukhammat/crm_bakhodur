@@ -33,7 +33,7 @@ export class RolePermissionController {
     }
 
     if (!permissionId) {
-      throw new CustomError('ID разрешения обязателен', 400);
+      throw new CustomError('Permission ID is required', 400);
     }
 
     const assigned = await this.rolePermissionService.assignPermissionToRole(roleId, permissionId);
@@ -45,15 +45,15 @@ export class RolePermissionController {
     const { permissionId } = await c.req.json();
 
     if (isNaN(roleId)) {
-      throw new CustomError('Неверный ID роли', 400);
+      throw new CustomError('Invalid role ID', 400);
     }
 
     if (!permissionId) {
-      throw new CustomError('ID разрешения обязателен', 400);
+      throw new CustomError('Permission ID is required', 400);
     }
 
     await this.rolePermissionService.removePermissionFromRole(roleId, permissionId);
-    return c.json({ message: 'Разрешение удалено из роли' });
+    return c.json({ message: 'Permission removed from role' });
   };
 }
 

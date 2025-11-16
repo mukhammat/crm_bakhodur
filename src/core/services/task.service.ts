@@ -67,7 +67,7 @@ export class TaskService implements ITaskService {
     });
 
     if (!task) {
-      throw new CustomError("Задача не найдена");
+      throw new CustomError("Task not found");
     }
 
     return task;
@@ -122,7 +122,7 @@ export class TaskService implements ITaskService {
       .returning({ id: tasks.id });
 
     if (!updated) {
-      throw new CustomError("Задача для обновления не найдена");
+      throw new CustomError("Task to update not found");
     }
 
     return updated;
@@ -137,21 +137,21 @@ export class TaskService implements ITaskService {
       });
 
     if (deleted.length === 0) {
-      throw new CustomError("Задача для удаления не найдена");
+      throw new CustomError("Task to delete not found");
     }
 
     return deleted[0];
   }
 
   /**
-   * Получает задачи с dueDate для отправки напоминаний
-   * Возвращает задачи, которые не выполнены (statusId !== 3) и имеют назначения
+   * Gets tasks with dueDate for sending reminders
+   * Returns tasks that are not completed (statusId !== 3) and have assignments
    */
   public async getTasksForReminders(): Promise<TaskWithAssignmentsForReminders[]> {
     return this.db.query.tasks.findMany({
       where: and(
         isNotNull(tasks.dueDate),
-        ne(tasks.statusId, 3) // 3 - выполнено
+        ne(tasks.statusId, 3) // 3 - completed
       ),
       with: {
         assignments: {

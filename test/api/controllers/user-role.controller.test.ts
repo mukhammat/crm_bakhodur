@@ -12,7 +12,7 @@ describe('UserRoleController', () => {
     }
 
     const res = await ctrl.generateRegisterKey(ctx as any)
-    expect(res).toEqual({ body: { error: 'Укажите ?role=MANAGER или ?role=WORKER' }, status: 400 })
+    expect(res).toEqual({ body: { error: 'Specify ?role=MANAGER or ?role=WORKER' }, status: 400 })
     expect(mockService.generateRegisterKey).not.toHaveBeenCalled()
   })
 

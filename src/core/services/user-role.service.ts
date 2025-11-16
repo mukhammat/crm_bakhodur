@@ -64,13 +64,13 @@ export class UserRoleService implements IUserRoleService {
         })
 
         if(!role) {
-            throw new CustomError("Роль не найден!");
+            throw new CustomError("Role not found!");
         }
 
-        // генерим случайный ключ (50 символов в hex = 25 байт)
+        // generate random key (50 hex characters = 25 bytes)
         const key = randomBytes(25).toString("hex");
 
-        // кладем в Redis с TTL 1 час
+        // store in Redis with TTL 1 hour
         await redis.set(`register_key:${key}`, role.id, 'EX', 3600);
 
         return key;

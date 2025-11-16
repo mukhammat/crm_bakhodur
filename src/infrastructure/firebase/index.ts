@@ -72,7 +72,7 @@ bootstrap.eventBus.on('task.remember', async (data) => {
       return;
     }
 
-    // Проверяем, что задача еще не выполнена
+    // Check that task is not yet completed
     if(task.statusId === 3) {
       console.log('Task is completed, skipping reminder.');
       return;

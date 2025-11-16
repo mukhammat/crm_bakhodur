@@ -17,12 +17,12 @@ export class TaskCallback {
     
             const [_, taskId] = data.split(':');
             if (!taskId) {
-                await ctx.reply('Ошибка: не указан ID задачи');
+                await ctx.reply('Error: task ID not specified');
                 return;
             }
     
             if (!ctx.user?.id) {
-                await ctx.reply('Ошибка: пользователь не найден');
+                await ctx.reply('Error: user not found');
                 return;
             }
 
@@ -31,7 +31,7 @@ export class TaskCallback {
             if(assignment) {
                 for (const element of assignment) {
                     if(element.task.statusId === 2) {
-                        await ctx.reply('Вы не можете выполнять несколько задач одновременно!')
+                        await ctx.reply('You cannot work on multiple tasks simultaneously!')
                         close = true
                     }
                 }
@@ -45,10 +45,10 @@ export class TaskCallback {
                 statusId: 2,
             });
 
-            await ctx.reply('Вы взяли задачу на выполнение!')
+            await ctx.reply('You have taken the task for execution!')
         } catch(error) {
             console.error('Error in take callback:', error);
-            throw error; // Пробрасываем ошибку дальше для обработки middleware
+            throw error; // Rethrow error for middleware handling
         }
     }
 
@@ -60,7 +60,7 @@ export class TaskCallback {
             
             const [_, taskId] = data.split(':');
             if (!taskId) {
-                await ctx.reply('Ошибка: не указан ID задачи');
+                await ctx.reply('Error: task ID not specified');
                 return;
             }
             
@@ -68,10 +68,10 @@ export class TaskCallback {
                 statusId: 3
             });
             
-            await ctx.reply('Задача отмечена как выполненная!');
+            await ctx.reply('Task marked as completed!');
         } catch(error) {
             console.error('Error in complete callback:', error);
-            throw error; // Пробрасываем ошибку дальше для обработки middleware
+            throw error; // Rethrow error for middleware handling
         }
     }
 }

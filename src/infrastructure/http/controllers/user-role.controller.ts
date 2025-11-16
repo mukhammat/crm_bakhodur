@@ -15,7 +15,7 @@ export class UserRoleController {
     const userRole = await this.userRoleService.getById(id);
     
     if (!userRole) {
-      throw new CustomError("Роль не найдена", 404);
+      throw new CustomError("Role not found", 404);
     }
     
     return c.json({ userRole });
@@ -44,7 +44,7 @@ export class UserRoleController {
     const role = c.req.param("role");
 
     if (!role || role === 'ADMIN') {
-      return c.json({ error: "Укажите ?role=MANAGER или ?role=WORKER" }, 400);
+      return c.json({ error: "Specify ?role=MANAGER or ?role=WORKER" }, 400);
     }
 
     const key = await this.userRoleService.generateRegisterKey(role);

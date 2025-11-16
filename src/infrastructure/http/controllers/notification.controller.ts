@@ -11,7 +11,7 @@ export class NotificationController {
         } = await c.req.json();
 
         if(typeof data.userId !== 'string') {
-            throw new CustomError('userId должен быть string')
+            throw new CustomError('userId must be a string')
         }
 
         const notification = 

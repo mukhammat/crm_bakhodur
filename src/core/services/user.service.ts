@@ -45,7 +45,7 @@ export class UserService implements IUserService {
     .returning({ id: users.id });
 
     if (!updated) {
-      throw new CustomError("Пользователь для обновления не найден");
+      throw new CustomError("User to update not found");
     }
 
     return updated.id
@@ -58,7 +58,7 @@ export class UserService implements IUserService {
     .returning({ id: users.id });
 
     if (!deleted) {
-      throw new CustomError("Пользователь для удаления не найден");
+      throw new CustomError("User to delete not found");
     }
 
     return deleted.id
@@ -76,7 +76,7 @@ export class UserService implements IUserService {
     })
 
     if(!user) {
-      throw new CustomError("Пользователь не найден", 404);
+      throw new CustomError("User not found", 404);
     }
 
     return user;

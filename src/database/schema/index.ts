@@ -34,7 +34,7 @@ export const tasks = table("tasks", {
   //.notNull()
   .references(() => taskStatuses.id),
   createdAt: t.timestamp('created_at').notNull().defaultNow(),
-  dueDate: t.timestamp('due_date'), // Срок выполнения задачи
+  dueDate: t.timestamp('due_date'), // Task due date
   createdBy: t.uuid('created_by')
   .notNull()
   .references(() => users.id, { onDelete: 'cascade' }),

@@ -21,7 +21,7 @@ export class PermissionController {
         const permission = await this.permissionService.getById(id);
         
         if (!permission) {
-            return c.json({ error: "Разрешение не найдено" }, 404);
+            return c.json({ error: "Permission not found" }, 404);
         }
         
         return c.json({ permission });

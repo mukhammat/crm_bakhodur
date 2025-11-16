@@ -19,7 +19,7 @@ export class TaskCommand {
             const assignments = await this.taskAssigService.getByUserId(ctx.user.id);
 
             if(!assignments.length) {
-                await ctx.reply('Нет заданий')
+                await ctx.reply('No tasks')
                 return;
             }
             
@@ -29,25 +29,25 @@ export class TaskCommand {
                 
                 counter++;
                 const task = assignment.task;
-                let message = `Задание №${counter}\n${task.title}\n${task.description}\n`;
+                let message = `Task #${counter}\n${task.title}\n${task.description}\n`;
 
                 if(task.statusId === 2) {
-                    inline.text('Закончить', `complete:${assignment.taskId}`)
+                    inline.text('Complete', `complete:${assignment.taskId}`)
                 }
 
                 if(task.statusId === 1) {
-                    inline.text('Приступить', `take:${assignment.taskId}`)
+                    inline.text('Start', `take:${assignment.taskId}`)
                 }
 
                 if(task.statusId === 3) {
-                    message = message + '\n✅ Выполнено'
+                    message = message + '\n✅ Completed'
                 }
 
                 await ctx.reply(message, {reply_markup: inline})
             }
         } catch(error) {
             console.error('Error in myTasks:', error);
-            await ctx.reply('Произошла ошибка при получении задач');
+            await ctx.reply('An error occurred while retrieving tasks');
         }
     }
 
@@ -60,7 +60,7 @@ export class TaskCommand {
             })
 
             if(!tasks.length) {
-                await ctx.reply('Нет выполненных задач');
+                await ctx.reply('No completed tasks');
                 return;
             }
 
@@ -69,13 +69,13 @@ export class TaskCommand {
                 const inline = new InlineKeyboard()
                 
                 counter++;
-                let message = `Задание №${counter}\n${task.title}\n${task.description}\n✅ Выполнено`;
+                let message = `Task #${counter}\n${task.title}\n${task.description}\n✅ Completed`;
 
                 await ctx.reply(message, {reply_markup: inline})
             }
         } catch(error) {
             console.error('Error in getCompletedTasks:', error);
-            await ctx.reply('Произошла ошибка при получении выполненных задач');
+            await ctx.reply('An error occurred while retrieving completed tasks');
         }
     }
 
@@ -88,7 +88,7 @@ export class TaskCommand {
             })
 
             if(!tasks.length) {
-                await ctx.reply('Нет задач в ожидании');
+                await ctx.reply('No pending tasks');
                 return;
             }
 
@@ -97,17 +97,17 @@ export class TaskCommand {
                 const inline = new InlineKeyboard()
                 
                 counter++;
-                let message = `Задание №${counter}\n${task.title}\n${task.description}\n`;
+                let message = `Task #${counter}\n${task.title}\n${task.description}\n`;
 
                 if(task.statusId === 1) {
-                    inline.text('Приступить', `take:${task.id}`)
+                    inline.text('Start', `take:${task.id}`)
                 }
 
                 await ctx.reply(message, {reply_markup: inline})
             }
         } catch(error) {
             console.error('Error in getPendingTasks:', error);
-            await ctx.reply('Произошла ошибка при получении задач в ожидании');
+            await ctx.reply('An error occurred while retrieving pending tasks');
         }
     }
 
@@ -120,7 +120,7 @@ export class TaskCommand {
             })
 
             if(!tasks.length) {
-                await ctx.reply('Нет задач в процессе выполнения');
+                await ctx.reply('No tasks in progress');
                 return;
             }
 
@@ -129,17 +129,17 @@ export class TaskCommand {
                 const inline = new InlineKeyboard()
                 
                 counter++;
-                let message = `Задание №${counter}\n${task.title}\n${task.description}\n`;
+                let message = `Task #${counter}\n${task.title}\n${task.description}\n`;
 
                 if(task.statusId === 2) {
-                    inline.text('Закончить', `complete:${task.id}`)
+                    inline.text('Complete', `complete:${task.id}`)
                 }
 
                 await ctx.reply(message, {reply_markup: inline})
             }
         } catch(error) {
             console.error('Error in getInPorgressTasks:', error);
-            await ctx.reply('Произошла ошибка при получении задач в процессе');
+            await ctx.reply('An error occurred while retrieving tasks in progress');
         }
     }
 }

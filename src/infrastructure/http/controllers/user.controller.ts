@@ -30,7 +30,7 @@ export class UserController {
     const { id } = c.get('jwtPayload');
     
     if(userId === id) {
-      return c.json({ error: 'Вы не можете удалить себя!' }, 400);
+      return c.json({ error: 'You cannot delete yourself!' }, 400);
     }
 
     await this.userService.delete(userId);

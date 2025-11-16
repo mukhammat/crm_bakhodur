@@ -5,24 +5,24 @@ import { redis } from '../../../cache/redis.js'
 
 export class AuthConversation {
     public register = async (conversation: Conversation, ctx: Context) => {
-        await ctx.reply("Введите ключ регистрации:");
+        await ctx.reply("Enter registration key:");
     
         const { message } = await conversation.wait();
         const key = message?.text?.trim();
     
         if (!key) {
-            await ctx.reply("Нужен текстовый ключ. Попробуйте снова: /register");
+            await ctx.reply("Text key required. Try again: /register");
             return;
         }
     
         const role = await redis.get(`register_key:${key}`);
     
         if (!role) {
-            await ctx.reply("Неверный ключ!");
+            await ctx.reply("Invalid key!");
             return;
         }
     
-        const name = ctx.from?.first_name || ctx.from?.username || "Неизвестный пользователь";
+        const name = ctx.from?.first_name || ctx.from?.username || "Unknown user";
     
         await db.insert(users).values({
             email: ctx.chat?.id.toString() || "",
@@ -34,6 +34,6 @@ export class AuthConversation {
             id: users.id,
         });
         
-        await ctx.reply("Вы успешно зарегистрированы ✅");
+        await ctx.reply("You have been successfully registered ✅");
     }
 }

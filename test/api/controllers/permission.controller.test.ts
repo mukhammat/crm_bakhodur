@@ -100,7 +100,7 @@ describe('PermissionController', () => {
       await controller.getById(mockContext as Context)
 
       expect(permissionService.getById).toHaveBeenCalledWith(id)
-      expect(mockContext.json).toHaveBeenCalledWith({ error: 'Разрешение не найдено' }, 404)
+      expect(mockContext.json).toHaveBeenCalledWith({ error: 'Permission not found' }, 404)
     })
   })
 

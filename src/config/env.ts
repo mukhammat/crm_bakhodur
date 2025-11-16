@@ -1,5 +1,5 @@
 /**
- * Валидация переменных окружения при старте приложения
+ * Environment variables validation on application startup
  */
 
 const requiredEnvVars = [
@@ -24,32 +24,32 @@ export function validateEnv(): void {
   }
 
   if (missing.length > 0) {
-    console.error('Ошибка: Отсутствуют обязательные переменные окружения:');
+    console.error('Error: Missing required environment variables:');
     missing.forEach(envVar => {
       console.error(`   - ${envVar}`);
     });
-    console.error('\nПожалуйста, создайте файл .env и укажите все необходимые переменные.');
-    console.error('Смотрите .env.example для примера.\n');
+    console.error('\nPlease create a .env file and specify all required variables.');
+    console.error('See .env.example for reference.\n');
     process.exit(1);
   }
 
-  // Устанавливаем значения по умолчанию для опциональных переменных
+  // Set default values for optional variables
   for (const [key, defaultValue] of Object.entries(optionalEnvVars)) {
     if (!process.env[key]) {
       process.env[key] = defaultValue;
     }
   }
 
-  // Проверка SECRET_KEY на безопасность
+  // Check SECRET_KEY security
   if (process.env.SECRET_KEY && process.env.SECRET_KEY.length < 32) {
-    console.warn('Предупреждение: SECRET_KEY должен быть длиной минимум 32 символа для безопасности');
+    console.warn('Warning: SECRET_KEY must be at least 32 characters long for security');
   }
 
-  // Проверка NODE_ENV
+  // Check NODE_ENV
   if (process.env.NODE_ENV === 'production' && !process.env.SECRET_KEY?.includes('your_secret_key')) {
-    console.log('Переменные окружения проверены');
+    console.log('Environment variables validated');
   } else if (process.env.NODE_ENV === 'production') {
-    console.warn('Предупреждение: Используется дефолтный SECRET_KEY. Измените его в продакшене!');
+    console.warn('Warning: Using default SECRET_KEY. Change it in production!');
   }
 }
 

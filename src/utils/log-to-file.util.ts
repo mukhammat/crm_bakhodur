@@ -4,7 +4,7 @@ import path from 'path'
 export const logToFile = (message: string, filePath = 'application.log') => {
   const logsDir = path.resolve('./logs')
 
-  // Проверяем, есть ли папка logs, если нет — создаём
+  // Check if logs directory exists, create if not
   if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true })
   }

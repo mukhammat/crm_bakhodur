@@ -14,10 +14,10 @@ export class TaskAssignmentService implements ITaskAssignmentService {
   constructor(private db: DrizzleClient) {}
 
   public async create(taskId: string, userId: string) {
-    // Проверяем существование задачи
+    // Check task existence
     const task = await this.db.query.tasks.findFirst({ where: eq(tasks.id, taskId) })
     if (!task) {
-      throw new CustomError('Задача не найдена')
+      throw new CustomError('Task not found')
     }
 
     const [assign] = await this.db
@@ -35,7 +35,7 @@ export class TaskAssignmentService implements ITaskAssignmentService {
       .returning({ id: taskAssignments.id })
 
     if (!assign) {
-      throw new CustomError('Назначение задачи не найдено')
+      throw new CustomError('Task assignment not found')
     }
 
     return assign
