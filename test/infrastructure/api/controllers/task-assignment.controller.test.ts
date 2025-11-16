@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { TaskAssignmentController } from '../../../src/infrastructure/http/controllers/task-assignment.controller.js'
+import { TaskAssignmentController } from '../../../../src/infrastructure/http/controllers/task-assignment.controller.js'
 import { Context } from 'hono'
-import type { ITaskAssignmentService } from '../../../src/core/services/task-assignment.service.js'
+import type { ITaskAssignmentService } from '../../../../src/core/services/task-assignment.service.js'
 
 describe('TaskAssignmentController', () => {
     let taskAssignmentService: ITaskAssignmentService

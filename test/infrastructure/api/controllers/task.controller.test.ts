@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { Hono } from 'hono';
-import { TaskController } from '../../../src/infrastructure/http/controllers/task.controller.js';
-import type { ITaskService } from '../../../src/core/services/task.service.js';
-import { ContextJWT } from '../../../src/infrastructure/http/types/context-jwt.js';
+import { TaskController } from '../../../../src/infrastructure/http/controllers/task.controller.js';
+import type { ITaskService } from '../../../../src/core/services/task.service.js';
+import { ContextJWT } from '../../../../src/infrastructure/http/types/context-jwt.js';
 
 // Service mock
 const createMockService = (): ITaskService => ({

@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { TaskStatusController } from '../../../src/infrastructure/http/controllers/task-status.controller.js'
+import { TaskStatusController } from '../../../../src/infrastructure/http/controllers/task-status.controller.js'
 import { Context } from 'hono'
-import { CustomError } from '../../../src/core/errors/custom.error.js'
-import type { ITaskStatusService } from '../../../src/core/services/task-status.service.js'
+import { CustomError } from '../../../../src/core/errors/custom.error.js'
+import type { ITaskStatusService } from '../../../../src/core/services/task-status.service.js'
 
 describe('TaskStatusController', () => {
   let taskStatusService: ITaskStatusService
@@ -89,7 +89,6 @@ describe('TaskStatusController', () => {
       vi.mocked(mockContext.req.param).mockReturnValue(id)
       vi.mocked(mockContext.req.json).mockResolvedValue(updateData)
       vi.mocked(taskStatusService.update).mockResolvedValue(1)
-      vi.mocked(mockContext.json).mockReturnValue({ status: 200 } as any)
 
       await controller.update(mockContext as Context)
 
@@ -112,7 +111,6 @@ describe('TaskStatusController', () => {
 
       vi.mocked(mockContext.req.param).mockReturnValue(id)
       vi.mocked(taskStatusService.delete).mockResolvedValue(1)
-      vi.mocked(mockContext.json).mockReturnValue({ status: 200 } as any)
 
       await controller.delete(mockContext as Context)
 

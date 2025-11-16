@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import type { IUserService } from '../../../src/core/services/user.service.js';
-import { UserController } from '../../../src/infrastructure/http/controllers/user.controller.js';
-import { ContextJWT } from '../../../src/infrastructure/http/types/context-jwt.js';
-import { errorHandler } from '../../../src/infrastructure/http/middlewares/error-handler.js';
-import { CustomError } from '../../../src/core/errors/custom.error.js'
+import type { IUserService } from '../../../../src/core/services/user.service.js';
+import { UserController } from '../../../../src/infrastructure/http/controllers/user.controller.js';
+import { ContextJWT } from '../../../../src/infrastructure/http/types/context-jwt.js';
+import { errorHandler } from '../../../../src/infrastructure/http/middlewares/error-handler.js';
+import { CustomError } from '../../../../src/core/errors/custom.error.js'
 
 const createMockService = (): IUserService => ({
   getAll: vi.fn(),

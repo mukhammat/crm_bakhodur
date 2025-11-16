@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { PermissionController } from '../../../src/infrastructure/http/controllers/permission.controller.js'
+import { PermissionController } from '../../../../src/infrastructure/http/controllers/permission.controller.js'
 import { Context, Hono } from 'hono'
-import { IPermissionService } from '../../../src/core/services/permission.service.js'
+import { IPermissionService } from '../../../../src/core/services/permission.service.js'
 
 const createMockService = (): IPermissionService => ({
   create: vi.fn(),
